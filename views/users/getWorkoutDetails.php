@@ -540,6 +540,5 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
 
 </body>
  <script src="/workout_trackersys/scripts/redirect.js"></script>
- <script src="/workout_trackersys/scripts/workouts.js"></script>
  <script src="/workout_trackersys/scripts/workoutdetails.js"></script>
 </html>

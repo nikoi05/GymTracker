@@ -892,11 +892,10 @@ function saveEditExercise() {
         }
     });
 }
-
 /* ============================================================
-   SWEETALERT2 MIXINS
+   GYMSWAL & GYMTOAST (shared) - MUST BE DECLARED FIRST
 ============================================================ */
-const GymSwall = Swal.mixin({
+const GymSwal = Swal.mixin({
     customClass: { container: 'swal-on-top' },
     backdrop: 'rgba(0,0,0,0.5)',
     didOpen: (popup) => {
@@ -929,13 +928,13 @@ const GymSwall = Swal.mixin({
         }
     }
 });
-
+ 
 const GymToast = Swal.mixin({
-    toast:             true,
-    position:          'top-end',
-    showConfirmButton: false,
-    timer:             3000,
-    timerProgressBar:  true,
+    toast:              true,
+    position:           'top-end',
+    showConfirmButton:  false,
+    timer:              3000,
+    timerProgressBar:   true,
     customClass: { container: 'swal-on-top' },
     didOpen: (toast) => {
         toast.style.background     = 'rgba(9,9,121,0.95)';
@@ -945,5 +944,40 @@ const GymToast = Swal.mixin({
         toast.style.color          = '#ffffff';
         toast.addEventListener('mouseenter', Swal.stopTimer);
         toast.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+});
+
+const themeToggle = document.getElementById('themeToggle');
+const themeLabel = document.getElementById('theme-label');
+const thumb = document.querySelector('.toggle-thumb i');
+// APPLY SAVED THEME ON LOAD
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggle.checked = true;
+        themeLabel.textContent = 'Dark';
+        thumb.textContent = 'brightness_2';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeToggle.checked = false;
+        themeLabel.textContent = 'Light';
+        thumb.textContent = 'brightness_5';
+    }
+});
+
+// TOGGLE CHANGE EVENT
+themeToggle.addEventListener('change', () => {
+    if (themeToggle.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeLabel.textContent = 'Dark';
+        thumb.textContent = 'brightness_2';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        themeLabel.textContent = 'Light';
+        thumb.textContent = 'brightness_5';
+        localStorage.setItem('theme', 'light');
     }
 });
