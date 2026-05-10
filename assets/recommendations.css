@@ -1,0 +1,301 @@
+/* Recommendations Page Styles - Matches dashboard/progress-goals */
+
+/* Hero Section */
+.rec-hero {
+  background: linear-gradient(135deg, var(--primary-gradient));
+  border-radius: var(--card-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.rec-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><radialGradient id=\"g\" cx=\"50%\" cy=\"50%\"><stop offset=\"0%\" stop-color=\"%23ffffff15\"/><stop offset=\"50%\" stop-color=\"%23ffffff05\"/><stop offset=\"100%\" stop-color=\"transparent\"/></radialGradient></defs><circle cx=\"30\" cy=\"30\" r=\"20\" fill=\"url(%23g)\"><animate attributeName=\"cx\" values=\"30;70;30\" dur=\"4s\" repeatCount=\"indefinite\"/></circle><circle cx=\"70\" cy=\"70\" r=\"15\" fill=\"url(%23g)\"><animate attributeName=\"cx\" values=\"70;30;70\" dur=\"4s\" repeatCount=\"indefinite\" begin=\"0.5s\"/></circle></svg>') no-repeat center/cover;
+  opacity: 0.3;
+}
+
+.rec-hero-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.rec-hero-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Stats Grid */
+.rec-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rec-stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.rec-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-color);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.rec-stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.rec-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.rec-stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.rec-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.rec-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Recommendations Grid */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rec-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.rec-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-large);
+}
+
+.rec-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--surface-variant);
+}
+
+.rec-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rec-card-subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.rec-card-body {
+  padding: 1.5rem;
+}
+
+.rec-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.rec-tag {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.rec-cta {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.rec-cta:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.rec-cta-secondary {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.rec-cta-secondary:hover {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+/* Tips Section */
+.rec-tips {
+  background: var(--surface);
+  border-radius: var(--card-radius);
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.rec-tips-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rec-tip {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: var(--border-radius);
+  background: var(--card-bg);
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.rec-tip:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateX(4px);
+}
+
+.rec-tip-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.rec-tip-content h4 {
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+}
+
+.rec-tip-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Loading States */
+.rec-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.rec-loading-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.rec-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.rec-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rec-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .rec-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rec-hero {
+    padding: 1.5rem;
+  }
+}
+
+/* Dark mode adjustments (assumes CSS vars defined in shared.css) */
+[data-theme="dark"] .rec-stat-card,
+[data-theme="dark"] .rec-card,
+[data-theme="dark"] .rec-tip {
+  background: var(--surface-dark);
+  border-color: var(--border-dark);
+}

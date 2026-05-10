@@ -1,0 +1,229 @@
+/* ============================================================
+   ADD EXERCISE MODAL — addexercisemodal.css
+   Extracted & adapted from workoutdetails.css design system
+   For .modal-footer with .btn-cancel / .btn-save buttons
+============================================================ */
+
+/* ============================================================
+   THEME VARIABLES (exact from workoutdetails.css)
+============================================================ */
+:root {
+    --bg:           #F0F6FF;
+    --surface:      #FFFFFF;
+    --surface-2:    #E8F0FE;
+    --border:       #DBEAFE;
+    --text:         #020024;
+    --text-muted:   #5B7BAF;
+    --accent:       #3B82F6;
+    --accent-sky:   #38BDF8;
+    --accent-light: rgba(59,130,246,0.10);
+    --accent-grad:  linear-gradient(45deg, #38BDF8, #3B82F6);
+    --shadow:       0 4px 24px rgba(9,9,121,0.10);
+    --shadow-hover: 0 8px 32px rgba(59,130,246,0.22);
+    --danger:       #EF4444;
+    --warning:      #F59E0B;
+    --success:      #22C55E;
+    --radius:       16px;
+    --radius-sm:    10px;
+    --transition:   0.25s ease;
+}
+
+[data-theme="dark"] {
+    --bg:           #020024;
+    --surface:      rgba(255,255,255,0.07);
+    --surface-2:    rgba(255,255,255,0.04);
+    --border:       rgba(255,255,255,0.12);
+    --text:         #F1F5F9;
+    --text-muted:   rgba(255,255,255,0.55);
+    --accent:       #38BDF8;
+    --accent-sky:   #38BDF8;
+    --accent-light: rgba(56,189,248,0.12);
+    --shadow:       0 4px 24px rgba(0,0,0,0.5);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+/* ============================================================
+   BASE & FONT (Poppins matching design)
+============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ============================================================
+   MODAL CONTAINER (adapted from .editmodal)
+============================================================ */
+.addexercisemodal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: modalBackdrop 0.3s ease;
+}
+
+.addexercisemodal.active {
+    display: flex;
+}
+
+@keyframes modalBackdrop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Modal content wrapper (if needed) */
+.addexercisemodal .modal-content {
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    animation: modalFade 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+@keyframes modalFade {
+    from { 
+        opacity: 0; 
+        transform: translateY(16px) scale(0.97); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+/* ============================================================
+   MODAL FOOTER — exact match for provided HTML
+============================================================ */
+.modal-footer {
+    margin-top: 16px; /* preserve inline */
+    padding: 20px 32px 24px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(12px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ============================================================
+   BUTTONS — matching workoutdetails.css .btn styles
+============================================================ */
+/* Cancel Button — secondary/flat style */
+.btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+}
+
+.btn-cancel:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Save Button — primary gradient matching .btn.blue */
+.btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 28px;
+    border-radius: 25px;
+    border: none;
+    background: var(--accent-grad);
+    color: white !important;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+    box-shadow: 0 6px 20px rgba(56,189,248,0.35);
+    text-decoration: none;
+}
+
+.btn-save:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(56,189,248,0.55);
+}
+
+.btn-save i {
+    font-size: 18px !important;
+    vertical-align: middle !important;
+}
+
+/* ============================================================
+   RESPONSIVE (matching workoutdetails.css)
+============================================================ */
+@media (max-width: 640px) {
+    .modal-footer {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-cancel,
+    .btn-save {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+    }
+    
+    .addexercisemodal .modal-content {
+        margin: 16px;
+        max-width: calc(100% - 32px);
+    }
+}
+
+/* ============================================================
+   DARK MODE INTEGRATION (already in vars)
+============================================================ */
+[data-theme="dark"] .modal-footer {
+    border-top-color: var(--border);
+}
+
+/* Material Icons override for consistency */
+.btn-save .material-icons {
+    font-size: 16px !important;
+}

@@ -1,0 +1,866 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+   
+   /* ============================================================
+           THEME VARIABLES — matched to landing page palette
+        ============================================================ */
+        :root {
+            /* Light mode — clean white with blue accents */
+            --bg:           #F0F6FF;
+            --surface:      #FFFFFF;
+            --surface-2:    #E8F0FE;
+            --border:       #DBEAFE;
+            --text:         #020024;
+            --text-muted:   #5B7BAF;
+            --accent:       #3B82F6;
+            --accent-sky:   #38BDF8;
+            --accent-light: rgba(59,130,246,0.10);
+            --accent-grad:  linear-gradient(45deg, #38BDF8, #3B82F6);
+            --shadow:       0 4px 24px rgba(9,9,121,0.10);
+            --shadow-hover: 0 8px 32px rgba(59,130,246,0.22);
+            --radius:       16px;
+            --radius-sm:    10px;
+            --transition:   0.25s ease;
+        }
+
+        /* Dark mode — matches landing page deep navy gradient */
+        [data-theme="dark"] {
+            --bg:           #020024;
+            --surface:      rgba(255,255,255,0.07);
+            --surface-2:    rgba(255,255,255,0.04);
+            --border:       rgba(255,255,255,0.12);
+            --text:         #F1F5F9;
+            --text-muted:   rgba(255,255,255,0.55);
+            --accent:       #38BDF8;
+            --accent-sky:   #38BDF8;
+            --accent-light: rgba(56,189,248,0.12);
+            --shadow:       0 4px 24px rgba(0,0,0,0.5);
+            --shadow-hover: 0 8px 32px rgba(0,0,0,0.6);
+        }
+
+        /* ============================================================
+           RESET & BASE
+        ============================================================ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        [data-theme="dark"] body,
+        [data-theme="dark"] .main {
+            background: linear-gradient(-45deg, #020024, #090979, #0f3460);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+/* INTRO LOADER */
+.intro-loader {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #090979;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    transition: top 0.5s ease;
+}
+
+.intro-loader .siteName {
+    color: white;
+    font-size: 60px;
+    letter-spacing: 5px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+.intro-loader .siteName span {
+    background: linear-gradient(45deg, #38BDF8, #3B82F6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+/* SIDEBAR */
+/* RESET */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow-x: hidden;
+}
+
+/* SIDEBAR */
+.Sidebar {
+    width: 80px;
+    height: 100vh;
+    background:#090979;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    transition: 0.3s ease;
+    z-index: 1000;
+}
+
+/* EXPANDED */
+.Sidebar.active {
+    width: 230px;
+}
+
+/* SECTIONS */
+.Sidebar div {
+    padding: 10px 0;
+}
+
+.NavLinks,
+.Planner,
+.Profile-Settings {
+    border-bottom: 1px  solid  #222;
+    border-bottom-style: dashed;
+
+    
+}
+
+/* LIST */
+.Sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ITEMS */
+.Sidebar ul li {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.Sidebar ul li:hover {
+    background:#2a27de;
+}
+
+/* ICONS */
+.icon {
+    font-size: 24px;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* TEXT (hidden by default) */
+.text {
+    opacity: 0;
+    white-space: nowrap;
+    transition: 0.3s;
+}
+
+/* SHOW TEXT WHEN EXPANDED */
+.Sidebar.active .text {
+    opacity: 1;
+    margin-left: 10px;
+}
+
+/* TOGGLE BUTTON */
+.toggle-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    margin: 10px;
+    cursor: pointer;
+}
+.toggle-btn:focus {
+    background-color: #090979 !important;
+}
+
+/* LOGOUT */
+.Logout button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: crimson;
+    color: white;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+/*ICON*/
+.Logout button i.material-icons{
+    display: inline-flex;
+    justify-content: center;
+    min-width: 24px;
+
+}
+.Sidebar:not(.active) .Logout .text{
+    display: none;
+}
+.Sidebar.active .Logout .text{
+    display: inline;
+}
+/* MAIN CONTENT */
+.main-content {
+    margin-left: 80px;
+    transition: 0.3s ease;
+    padding: 20px;
+}
+
+/* SHIFT WHEN SIDEBAR EXPANDS */
+.Sidebar.active ~ .main-content {
+    margin-left: 230px;
+}
+/* active page  */
+/* ACTIVE ITEM */
+.Sidebar ul li.active {
+    background: linear-gradient(90deg, #0502b4, #2b6ce3);
+    color: white;
+}
+
+/* Optional: icon emphasis */
+.Sidebar ul li.active .icon {
+    transform: scale(1.1);
+}
+
+/* Optional: left indicator bar (very modern look) */
+.Sidebar ul li.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #0502b4;
+}
+.Sidebar ul li {
+    position: relative;
+}
+
+/* OPTIONAL: nicer container */
+.main-container {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    animation: fadeUp 0.35s ease;
+}
+
+.title-header h2 {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.1;
+}
+
+.title-header h5 {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 5px;
+}
+
+/* ── Dark Mode Toggle ── */
+.toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.toggle {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.toggle input { display: none; }
+
+.toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 99px;
+    transition: var(--transition);
+}
+
+.toggle input:checked + .toggle-track { background: var(--accent); }
+
+.toggle-thumb {
+    position: absolute;
+    top: 4px; left: 4px;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: var(--transition);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+}
+
+.toggle input:checked ~ .toggle-thumb { left: 28px; }
+
+.light-icon { color: #F59E0B; font-size: 14px !important; }
+.dark-icon  { color: #020024; font-size: 14px !important; }
+
+
+
+
+ /* ── Stats Row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.10s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+        .stat-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--accent-light);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px;
+            font-size: 20px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* action Bar */
+        .add-btn{
+            display:flex; 
+            justify-content:flex-start; 
+            margin-bottom:15px;
+        }
+        .addbt{
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .addbt:hover{
+            background-color: var(--accent-sky);
+        }
+        [data-theme="dark"] .addbt:hover{
+            background-color: #2b6ce3!important;
+        }
+        .addbt:focus{
+            background-color: var(--accent-sky)!important;
+        }
+
+
+      /* =========================
+   CARD CONTAINER (THEME AWARE)
+========================= */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+/* =========================
+   TABLE BASE
+========================= */
+table.display {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+    background: transparent;
+}
+
+/* HEADER */
+table.display thead {
+    background: var(--accent);
+    color: #fff;
+}
+
+table.display th {
+    text-align: left;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* BODY */
+table.display td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+}
+
+/* ROW HOVER */
+table.display tbody tr:hover {
+    background: var(--accent-light);
+    transition: 0.2s;
+}
+
+/* STRIPED ROWS */
+table.display tbody tr:nth-child(even) {
+    background: var(--surface-2);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-small {
+    border: none;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-right: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+/* ICONS */
+.btn-small i.material-icons {
+    font-size: 18px;
+}
+
+/* EDIT BUTTON */
+.btn-small.blue {
+    background-color: var(--accent);
+    color: #fff;
+}
+
+.btn-small.blue:hover {
+    opacity: 0.85;
+}
+
+/* DELETE BUTTON */
+.btn-small.red {
+    background-color: #e53935;
+    color: #fff;
+}
+
+.btn-small.red:hover {
+    opacity: 0.85;
+}
+.light-icon{
+color: yellow;
+}
+.dark-icon{
+color: #020024;
+}
+/* =========================
+   MODAL OVERLAY (FIXED)
+========================= */
+.modal {
+    position: fixed !important; /* Force fixed positioning */
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.7) !important; /* Darker overlay */
+    backdrop-filter: blur(8px);
+    z-index: 20000 !important; /* Must be higher than Sidebar (1000) */
+    
+    /* Reset Materialize defaults */
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    opacity: 1 !important; 
+    visibility: visible !important;
+    max-height: 100% !important;
+}
+
+/* When active, show as flex */
+.modal.active {
+    display: flex !important;
+}
+/* Ensure both modals have the same background and positioning */
+#AddModal, #EditModal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dim background */
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+}
+
+/* Show modal when 'active' class is added via JS */
+#AddModal.active, #EditModal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--surface); /* Uses your theme variable */
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.add-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text);
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* Style for the browser-default select to match inputs */
+.browser-default {
+    height: 45px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 0 10px;
+    background: var(--input-bg);
+    color: var(--text);
+}
+/* FORCE VISIBILITY FOR MODAL BUTTONS */
+.register-button {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 50px !important; /* Ensure it has height */
+    background-color: #3B82F6 !important; /* Force the blue color */
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    margin-top: 20px !important;
+    cursor: pointer !important;
+    z-index: 9999 !important; /* Bring to very front */
+    position: relative !important;
+    font-weight: 600 !important;
+}
+
+/* Ensure the form doesn't clip the button */
+.add-form {
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Ensure the modal content is tall enough to show the button */
+.modal-content {
+    min-height: 400px !important;
+    padding-bottom: 50px !important;
+}
+.modal-close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    background: none; border: none;
+    font-size: 28px; color: var(--text-muted);
+    cursor: pointer; line-height: 1; z-index: 100;
+}
+.modal-close-btn:hover { color: #ff4d4d; }
+
+/* CANCEL BUTTON DESIGN */
+.cancel-btn {
+    flex: 1; /* Takes up 1/3 of the space in the footer */
+    background-color: transparent !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border) !important;
+    padding: 12px 20px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    text-transform: none !important; /* Prevents Materialize from forcing Uppercase */
+}
+
+.swal2-container{
+    z-index: 99999 !important;
+}
+/* DARK MODE INPUT TEXT COLORS */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] select.browser-default,
+[data-theme="dark"] .input-group label {
+    color: #FFFFFF !important; /* Forces text and labels to white */
+}
+
+/* Fix for the Date Picker icon and text */
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* Makes the calendar icon white */
+}
+
+/* Fix for Select Dropdown background and options */
+[data-theme="dark"] select.browser-default {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] select.browser-default option {
+    background-color: #020024; /* Matches your dark background */
+    color: #FFFFFF;
+}
+
+/* Ensure the Password Visibility icon is also visible */
+[data-theme="dark"] .input-wrapper .material-icons {
+    color: #FFFFFF !important;
+}
+
+/* ── Stats Row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.10s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+        .stat-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--accent-light);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 14px;
+            font-size: 20px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Ensure horizontal alignment on desktop, stack on mobile */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns horizontally */
+    gap: 16px;
+    margin-bottom: 24px;
+    width: 100%;
+}
+/* ============================================================
+   HIGH CONTRAST PAGINATION (DYNAMIC TEXT / WHITE BUTTONS)
+   ============================================================ */
+
+/* 1. Main Container */
+.dt-container .dt-paging {
+    margin-top: 24px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    background: transparent !important;
+}
+
+/* 2. Base Button Style - Always Pure White Background */
+.dt-container .dt-paging .dt-paging-button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
+    
+    background: var(--accent-grad) !important; /* Fixed White */
+    color: var(--text) !important;   /* Text color adapts to theme */
+    border: 1px solid var(--border) !important; 
+    
+    border-radius: var(--radius-sm) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    transition: var(--transition) !important;
+    box-shadow: var(--shadow) !important;
+    cursor: pointer !important;
+}
+
+/* 3. Hover State */
+.dt-container .dt-paging .dt-paging-button:hover:not(.disabled):not(.current) {
+    background: #FFFFFF !important; 
+    border-color: var(--accent) !important;
+    color: var(--accent) !important; /* Text highlights to accent color */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover) !important;
+}
+
+/* 4. Active Page (Signature Blue Gradient) */
+.dt-container .dt-paging .dt-paging-button.current,
+.dt-container .dt-paging .dt-paging-button.active {
+    background: var(--accent-grad) !important; 
+    color: #FFFFFF !important; /* Always white text on blue background */
+    border: none !important;
+    box-shadow: var(--shadow-hover) !important;
+}
+
+/* 5. Disabled State (Prev/Next when inactive) */
+.dt-container .dt-paging .dt-paging-button.disabled {
+    opacity: 0.5!important;
+    background: var(--accent-grad) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+/* 6. Dark Mode Text Polish */
+/* In dark mode, we keep the button white but ensure the text 
+   uses a high-contrast version of your theme colors */
+[data-theme="dark"] .dt-container .dt-paging .dt-paging-button:not(.current) {
+    background: var(--accent-grad) !important;
+    color: #020024 !important; /* High contrast dark text on white button */
+    border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 7. Structural Reset */
+.dt-paging nav, 
+.dt-paging div {
+    background: transparent !important;
+    padding: 0 !important;
+}
+@media (max-width: 1024px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr); /* 2x2 grid on tablets */
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-row {
+        grid-template-columns: 1fr; /* Stacked on phones */
+    }
+}
+
+/* Add the fadeUp animation you referenced in your CSS */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
