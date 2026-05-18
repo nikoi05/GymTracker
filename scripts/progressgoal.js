@@ -1,30 +1,52 @@
+function ToggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("active");
+    const isActive = sidebar.classList.contains('active');
+    localStorage.setItem('sidebar-state', isActive ? 'active' : 'inactive');
+}
+const themeToggle = document.getElementById('themeToggle');
+const themeLabel = document.getElementById('theme-label');
+const thumb = document.querySelector('.toggle-thumb i');
 
-        // Theme toggle handling
-        const themeToggle = document.getElementById('themeToggle');
-        const themeLabel = document.getElementById('theme-label');
-        
-        themeToggle?.addEventListener('change', function() {
-            const theme = this.checked ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
-        });
-        
-        // Initialize theme
-        (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            if (themeToggle) {
-                themeToggle.checked = savedTheme === 'dark';
-            }
-            if (themeLabel) {
-                themeLabel.textContent = savedTheme === 'dark' ? 'Dark' : 'Light';
-            }
-        })();
-    /* ── Sidebar Toggle ── */
-    function ToggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
+// APPLY SAVED THEME ON LOAD
+window.addEventListener('DOMContentLoaded', () => {
+    const savedStateToggle = localStorage.getItem('sidebar-state');
+    const sidebar = document.getElementById("sidebar");
+
+    if (savedStateToggle === 'active') {
+        sidebar.classList.add('active');
+    } else {
+        sidebar.classList.remove('active');
     }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (themeToggle) themeToggle.checked = true;
+        if (themeLabel) themeLabel.textContent = 'Dark';
+        if (thumb) thumb.textContent = 'brightness_2';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (themeToggle) themeToggle.checked = false;
+        if (themeLabel) themeLabel.textContent = 'Light';
+        if (thumb) thumb.textContent = 'brightness_5';
+    }
+});
+
+// TOGGLE CHANGE EVENT
+themeToggle?.addEventListener('change', () => {
+    if (themeToggle.checked) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (themeLabel) themeLabel.textContent = 'Dark';
+        if (thumb) thumb.textContent = 'brightness_2';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (themeLabel) themeLabel.textContent = 'Light';
+        if (thumb) thumb.textContent = 'brightness_5';
+        localStorage.setItem('theme', 'light');
+    }
+});
 
 // Global variables
 let currentGoals = [];
@@ -191,12 +213,12 @@ function renderRecentActivity(activities) {
         return;
     }
     
-    const icons = { workout: '💪', goal: '🎯', milestone: '🏆' };
+    const icons = { workout: 'fitness_center', goal: 'track_changes', milestone: 'emoji_events' };
     list.innerHTML = activities.map(a => `
         <div class="timeline-item">
             <div class="timeline-date">${a.date}</div>
             <div class="timeline-content">
-                <span style="margin-right:8px">${icons[a.type] || '📊'}</span>
+                <span class="material-icons" style="margin-right:8px; vertical-align:middle; font-size:18px">${icons[a.type] || 'bar_chart'}</span>
                 <strong>${a.name}</strong>
                 ${a.duration ? `<span style="color:var(--text-muted)"> — ${a.duration}</span>` : ''}
                 ${a.status ? `<span class="badge badge-success" style="margin-left:8px">${a.status}</span>` : ''}
@@ -225,11 +247,11 @@ function renderGoals(goals) {
     }
     
     const categoryIcons = {
-        strength: '💪',
-        weight: '⚖️',
-        endurance: '🏃',
-        cardio: '❤️',
-        flexibility: '🧘'
+        strength: 'fitness_center',
+        weight: 'monitor_weight',
+        endurance: 'directions_run',
+        cardio: 'favorite',
+        flexibility: 'self_improvement'
     };
     
     container.innerHTML = goals.map(goal => {
@@ -239,7 +261,9 @@ function renderGoals(goals) {
             <div class="goal-card">
                 <div class="goal-header">
                     <div style="display:flex;align-items:center">
-                        <div class="goal-icon" style="background:${goal.color || 'var(--accent-light)'}">${categoryIcons[goal.category] || '🎯'}</div>
+                        <div class="goal-icon" style="background:${goal.color || 'var(--accent-light)'}">
+                            <span class="material-icons">${categoryIcons[goal.category] || 'flag'}</span>
+                        </div>
                         <div class="goal-info">
                             <div class="goal-title">${goal.name}</div>
                             <div class="goal-meta">Target: ${goal.target} ${goal.unit}</div>
@@ -546,44 +570,21 @@ function switchProgressChart(type, btn) {
     });
 }
 
-// Sidebar toggle
-function ToggleSidebar() {
-    document.getElementById('sidebar')?.classList.toggle('active');
-}
-
 // Logout function
-function LogoutFunc() {
-    GymSwal.fire({
+window.LogoutFunc = window.LogoutFunc || function() {
+    (window.GymSwal || Swal).fire({
         title: 'Leaving so soon?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Yes, log out',
         cancelButtonText: 'Stay'
-    }).then(result => {
-        if (result.isConfirmed) {
-            window.location.href = '?page=login';
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.ajax({
+                url: '/workout_trackersys/controllers/logout.php',
+                type: 'POST',
+                success: () => window.location.href = '?page=login'
+            });
         }
     });
-}
-
-// Theme toggle handling
-const themeToggle = document.getElementById('themeToggle');
-if (themeToggle) {
-    themeToggle.addEventListener('change', () => {
-        const t = themeToggle.checked ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('theme', t);
-
-        if (currentProgressData.weeklyActivity) {
-            renderProgressChart(currentProgressData.weeklyActivity);
-        }
-    });
-}
-
-// Initialize theme from localStorage
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-if (themeToggle) {
-    themeToggle.checked = savedTheme === 'dark';
-}
-
+};

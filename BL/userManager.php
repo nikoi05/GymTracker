@@ -20,7 +20,33 @@ public function LoginFunc($email, $password){ // NOTE: IN THE USERMODEL WE VALID
         session_start();
     }
     try{
-         return $this->UserModel->LoginFunc($email,$password);
+        if(empty($email) || empty($password)){
+            return  false;
+        }
+        // checked if user is locked or nah
+        if($this->UserModel->isLocked($email)){
+            return "locked";
+
+        }
+        // get info to validate password
+        $user = $this->UserModel->LoginFunc($email, $password);
+        if($user && password_verify($password, $user['password'])){
+            session_regenerate_id(true);
+            //store into session
+            $_SESSION['userID'] = $user['userID'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['profileLevel'] = $user['profileLevel'];
+            $this->UserModel->resetAttempts($email);
+            return true;
+            }
+        else{
+            $this->UserModel->recordAttempts($email);
+        return false;
+
+        }
+
+
     }catch(InvalidArgumentException $e){
     echo "Error: " . $e->getMessage();
 }
@@ -69,14 +95,14 @@ public function getAllUsersDetails(){
 
 
 }
-public function updateUserDetails($userID, $username, $email,$password, $gender, $dateofBirth,$role){
-     return $this->UserModel->updateUserDetails($userID, $username, $email,$password, $gender, $dateofBirth,$role);
+public function updateUserDetails($userID, $username, $password, $email, $gender, $dateofBirth, $role){
+     return $this->UserModel->updateUserDetails($userID, $username, $password, $email, $gender, $dateofBirth, $role);
 }
 
 public function deleteUser($userID){
     return $this->UserModel->deleteUser($userID);
 }
-public function updateActivity($userID){
+public function  updateActivity($userID){
     return $this->UserModel->updateActivity($userID);
 }
 public function getActiveToday(){
@@ -89,5 +115,15 @@ public function getweeklyRegistration(){
 public function getMonthlyRegistration(){
     return $this->UserModel->getuserMonthly();
 }
+public function getRoles(){
+    return $this->UserModel->readRoles();
 }
-?>
+public function updateProfile($userID,$username,$gender,$dob,$email){
+    return $this->UserModel->updateProfile($userID,$username,$gender,$dob,$email);
+}
+public function getGender(){
+    return $this->UserModel->getGender();
+
+}
+}
+?>  

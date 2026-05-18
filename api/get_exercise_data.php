@@ -2,7 +2,7 @@
     require_once __DIR__ . "../../BL/exerciseManage.php";
     $em = new ExerciseManage();
   
-    $exerciseData= $em->readExercises();
+    $exerciseData= $em->getAllExercise();
     
 
 

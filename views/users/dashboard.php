@@ -16,9 +16,11 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/workout_trackersys/assets/animations-global.css">
      <link rel="stylesheet" href="/workout_trackersys/assets/dashboard.css">
+
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
           <!-- Compiled and minified CSS -->
@@ -27,7 +29,8 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
             
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">  
-    <title>DASHBOARD</title>
+    <title>GymTracker - Dashboard</title>
+    <link rel="stylesheet" href="/workout_trackersys/assets/user-enhancements.css">    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
 <body>
  <div class="intro-loader">
@@ -37,8 +40,8 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
 <div class="Sidebar" id="sidebar">
 
     <div class="NavLinks">
-        <button class="toggle-btn" onclick="ToggleSidebar()">☰</button>
-        <span class="text">GymTracker</span>
+        <button class="toggle-btn" onclick="ToggleSidebar()"><i class="material-icons">menu</i></button>
+        <div class="sidebar-brand"><span class="sidebar-logo" aria-hidden="true">&#128170;</span><span class="text"><span class="brand-gym">Gym</span>Tracker</span></div>
         <ul>
             <li class="active" onclick="redirectUser(1)">
                 <i class="material-icons icon">dashboard</i>
@@ -80,7 +83,15 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
         </ul>
     </div>
 
-    <div class="Logout">  
+        <div class="sidebar-theme">
+        <span class="toggle-label" id="theme-label">Light</span>
+        <label class="toggle">
+            <input type="checkbox" id="themeToggle">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"><i class="material-icons">brightness_5</i></div>
+        </label>
+    </div>
+<div class="Logout">  
         <button type="button" onclick="LogoutFunc()">
             <i class="material-icons">logout</i>
             <span class="text">Logout</span>
@@ -92,30 +103,25 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
 <!-- MAIN CONTENT -->
 <div class="main-content">
     <div class="main-container">
-        <div class="top-bar">
-             <div class="greeting">
-                <h3>Hello, <?= $_SESSION['username'] ?></h3>
-                <h5>let’s take a look at your activity today</h5>
+        <section class="page-hero">
+            <div>
+                <span class="section-kicker">Your Fitness Hub</span>
+                <h2>Dashboard</h2>
+                 <h3>Hello, <?= $_SESSION['username'] ?></h3>
+                <p>Track your workouts, monitor your progress, and stay on top of your goals.</p>
             </div>
-            <div class="toggle-wrap">
-                <span class="toggle-label" id="theme-label">Light</span>
-                <label class="toggle">
-                    <input type="checkbox" id="themeToggle">
-                    <div class="toggle-track"></div>
-                    <div class="toggle-thumb"><i class="material-icons light-icon">brightness_5</i></div>
-                </label>
-            </div>
-        </div>
+            <div class="hero-icon"><i class="material-icons">dashboard</i></div>
+        </section>
          <div class="stats-grid">
         <div class="stat-card" style="animation-delay:0.05s">
             <div class="stat-top">
-                <div class="stat-icon">🏋️</div>
+                <div class="stat-icon"><i class="material-icons">fitness_center</i></div>
             </div>
             <div class="stat-val" id="statWorkouts"><?=  $totalWorkoutMonth['TotalWorkouts'] ?></div>
             <div class="stat-label">Workouts This Month</div>
         </div>
         <div class="stat-card" style="animation-delay:0.10s">
-            <div class="stat-top"><div class="stat-icon">⏱️</div>
+            <div class="stat-top"><div class="stat-icon"><i class="material-icons">timer</i></div>
         </div>
         <div class="stat-val" id="statHours"><?= $totalTime ?>
     </div>
@@ -123,16 +129,15 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
 </div>
         <div class="stat-card" style="animation-delay:0.15s">
             <div class="stat-top">
-                <div class="stat-icon">🎯</div>
+                <div class="stat-icon"><i class="material-icons">flag</i></div>
                 <span class="stat-change neutral">steady</span>
             </div>
-            <div class="stat-val" id="statGoals"><?= $ActiveGoals[0]['ActiveGoals'] ?></div>
+            <div class="stat-val" id="statGoals"><?= $ActiveGoals[0]['ActiveGoals'] ?? 0?></div>
             <div class="stat-label">Active Goals</div>
         </div>
         <div class="stat-card" style="animation-delay:0.20s">
             <div class="stat-top">
-                <div class="stat-icon">📈</div>
-           
+                <div class="stat-icon"><i class="material-icons">local_fire_department</i></div>
         </div
         ><div class="stat-val" id="statPR"></div><div class="stat-label">Streak</div>
         </div>
@@ -152,11 +157,10 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
         <div class="card" style="animation-delay:0.15s">
             <div class="card-header"><div class="card-title">Quick Actions</div></div>
             <div class="quick-actions">
-                <div class="qa-btn" onclick="redirectUser(2)"><div class="qa-icon">💪</div><div class="qa-label">Workouts</div></div>
-                <div class="qa-btn" onclick="redirectUser(3)"><div class="qa-icon">📚</div><div class="qa-label">Exercises</div></div>
-                <div class="qa-btn" onclick="redirectUser(4)"><div class="qa-icon">📈</div><div class="qa-label">Progress</div></div>
-
-                <div class="qa-btn" onclick="redirectUser(5)"><div class="qa-icon">🎯</div><div class="qa-label">Goals</div></div>
+                <div class="qa-btn" onclick="redirectUser(2)"><div class="qa-icon"><i class="material-icons">fitness_center</i></div><div class="qa-label">Workouts</div></div>
+                <div class="qa-btn" onclick="redirectUser(3)"><div class="qa-icon"><i class="material-icons">directions_run</i></div><div class="qa-label">Exercises</div></div>
+                <div class="qa-btn" onclick="redirectUser(4)"><div class="qa-icon"><i class="material-icons">show_chart</i></div><div class="qa-label">Progress</div></div>
+                <div class="qa-btn" onclick="redirectUser(5)"><div class="qa-icon"><i class="material-icons">flag</i></div><div class="qa-label">Goals</div></div>
             </div>
         </div>
     </div>
@@ -177,7 +181,15 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
     </div>
         
         
-        </div>
+</div>
+</div>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span>Tracker</div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -185,5 +197,7 @@ $ActiveGoals = $gm->GetGoalsInfos($_SESSION['userID']);
 <script src="/workout_trackersys/scripts/dashboard.js"></script>
 <script src="/workout_trackersys/scripts/magic.js"></script>
 <script src="/workout_trackersys/scripts/authservices.js"></script>
+<script src="/workout_trackersys/assets/animations-observer.js"></script>
+
 
 </html>

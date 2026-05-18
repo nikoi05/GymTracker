@@ -222,6 +222,80 @@ return $data;
         echo "Error" . $e->getMessage();
     }
 }
+public function getWorkoutAnalytics($userID){
+    try{
+         // Last 7 days workout frequency (count)
+    $weeklyStmt = $this->conn->prepare(
+        "SELECT DATE(date_completed) AS day, COUNT(*) AS workouts
+         FROM tbl_user_workout_sessions
+         WHERE userID = :userID
+           AND status = 'completed'
+           AND DATE(date_completed) >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+         GROUP BY DATE(date_completed)
+         ORDER BY day ASC"
+    );
+    $weeklyStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $weeklyStmt->execute();
+    $weeklyRows = $weeklyStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Monthly frequency for current year (count per month)
+    $monthlyStmt = $this->conn->prepare(
+        "SELECT MONTH(date_completed) AS month_num, COUNT(*) AS workouts
+         FROM tbl_user_workout_sessions
+         WHERE userID = :userID
+           AND status = 'completed'
+           AND YEAR(date_completed) = YEAR(CURDATE())
+         GROUP BY MONTH(date_completed)
+         ORDER BY month_num ASC"
+    );
+    $monthlyStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $monthlyStmt->execute();
+    $monthlyRows = $monthlyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Last 12 weeks duration trend (minutes)
+    $volumeStmt = $this->conn->prepare(
+        "SELECT YEARWEEK(date_completed, 3) AS yw, SUM(duration_seconds) AS total_seconds
+         FROM tbl_user_workout_sessions
+         WHERE userID = :userID
+           AND status = 'completed'
+           AND date_completed >= DATE_SUB(CURDATE(), INTERVAL 11 WEEK)
+         GROUP BY YEARWEEK(date_completed, 3)
+         ORDER BY yw ASC"
+    );
+    $volumeStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $volumeStmt->execute();
+    $volumeRows = $volumeStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Last 91 days activity (for heatmap)
+
+    $heatmapStmt = $this->conn->prepare(
+        "SELECT DATE(date_completed) AS day, COUNT(*) AS workouts
+         FROM tbl_user_workout_sessions
+         WHERE userID = :userID
+           AND status = 'completed'
+           AND DATE(date_completed) >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
+         GROUP BY DATE(date_completed)
+         ORDER BY day ASC"
+    );
+    $heatmapStmt->bindParam(':userID', $userID, PDO::PARAM_INT);
+    $heatmapStmt->execute();
+    $heatmapRows = $heatmapStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    $data = [
+        'weekly' => $weeklyRows,
+        'monthly' => $monthlyRows,
+        'volume' => $volumeRows,
+        'heatmap' => $heatmapRows
+    ];
+
+    return  $data;
+
+    }catch(PDOException $e){
+        echo "Error" . $e->getMessage();
+        return false;
+    }
+
+}
 }
 
 ?>

@@ -1,5 +1,169 @@
 let exerciseData = [];
 
+/* ============================================================
+   UI CONSTANTS (Shared)
+============================================================ */
+window.GymSwal = window.GymSwal || Swal.mixin({
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-swal-popup',
+        title: 'gym-swal-title',
+        htmlContainer: 'gym-swal-text',
+        confirmButton: 'gym-swal-confirm',
+        cancelButton: 'gym-swal-cancel'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    backdrop: 'rgba(2, 6, 23, 0.62)',
+    buttonsStyling: false,
+    didOpen: (p) => {
+        p.style.borderRadius = '18px';
+        p.style.border = '1px solid var(--border)';
+        p.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        const ok = p.querySelector('.swal2-confirm');
+        if (ok) { ok.style.background = 'linear-gradient(45deg,#38BDF8,#3B82F6)'; ok.style.color = '#fff'; ok.style.border = 'none'; ok.style.borderRadius = '999px'; ok.style.padding = '10px 20px'; ok.style.fontWeight = '600'; }
+        const no = p.querySelector('.swal2-cancel');
+        if (no) { no.style.background = 'var(--surface-2)'; no.style.color = 'var(--text)'; no.style.border = '1px solid var(--border)'; no.style.borderRadius = '999px'; no.style.padding = '10px 20px'; no.style.fontWeight = '600'; }
+    }
+});
+
+const GymToast = window.GymToast || Swal.mixin({
+    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true,
+    customClass: { container: 'swal-on-top', popup: 'gym-toast-popup', title: 'gym-toast-title', htmlContainer: 'gym-toast-text' },
+    background: 'var(--surface)', color: 'var(--text)',
+    didOpen: (t) => {
+        t.style.borderRadius = '12px'; t.style.border = '1px solid var(--border)'; t.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        t.addEventListener('mouseenter', Swal.stopTimer); t.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+});
+
+window.GymSwal = GymSwal;
+window.GymToast = GymToast;
+
+function ToggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    if (!sidebar) return;
+    sidebar.classList.toggle("active");
+    const isActive = sidebar.classList.contains('active');
+    localStorage.setItem('sidebar-state', isActive ? 'active' : 'inactive');
+}
+
+// Theme helpers (getWorkoutDetails.php may not include the toggle UI)
+function applyTheme(theme) {
+    const t = (theme || 'light').toLowerCase() === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+
+    const themeToggleEl = document.getElementById('themeToggle');
+    const themeLabelEl  = document.getElementById('theme-label');
+    const thumbEl       = document.querySelector('.toggle-thumb i');
+
+    if (themeToggleEl) themeToggleEl.checked = (t === 'dark');
+    if (themeLabelEl) themeLabelEl.textContent = (t === 'dark') ? 'Dark' : 'Light';
+    if (thumbEl) thumbEl.textContent = (t === 'dark') ? 'brightness_2' : 'brightness_5';
+}
+
+// Always apply theme on load; toggle UI may not exist on this page.
+window.addEventListener('DOMContentLoaded', () => {
+    applyTheme(localStorage.getItem('theme') || 'light');
+});
+
+
+
+function EditWorkout($WorkoutID){
+    const Editmodal = document.getElementById('EditWorkoutModal');
+    Editmodal.classList.add('active'); 
+    }
+function SaveEdit(WorkoutID){
+    let workoutName = document.getElementById("editWorkoutName").value.trim();
+    let workoutDescription = document.getElementById("editWorkoutDescription").value.trim();
+    if(!workoutName){
+        GymToast.fire({
+            icon: 'error',
+            title: 'Please input workout name'
+        });
+        return; 
+    }
+     $.ajax({
+        url:"/workout_trackersys/controllers/Workoutcontroller.php",
+        type:"POST",
+        data:{
+            action: "Edit",
+            EditworkoutID: WorkoutID,
+            EditworkoutName: workoutName,
+            EditworkoutDescription: workoutDescription,
+        },
+success:function(result){
+            if (String(result).trim().toLowerCase() === "success") {
+                // Close modal first
+                closeModalEdit();
+                GymToast.fire({
+                    icon: 'success',
+                    title: 'Workout updated successfully'
+                });
+                // Delay reload to allow toast to display
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        }
+    })
+
+}
+
+//close modal for edit workout
+function closeModalEdit(){
+    const modal = document.getElementById('EditWorkoutModal');
+    modal.classList.remove('active');
+}
+function DeleteWorkout(WorkoutID) {
+    // Show confirmation dialog using GymSwal
+    GymSwal.fire({
+        text: 'Are you sure you want to delete this workout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "/workout_trackersys/controllers/Workoutcontroller.php",
+                type: "POST",
+                data: {
+                    action: "Delete",
+                    workoutID: WorkoutID
+                },
+success: function(result) {
+                    const normalized = String(result).trim().replace(/^"+|"+$/g, '').toLowerCase();
+                    if (normalized === "success") {
+                        GymToast.fire({
+                            icon: 'success',
+                            title: 'Workout deleted successfully'
+                        });
+                        // Delay reload to allow toast to display
+                        setTimeout(() => {
+                            window.location.href = "index.php?page=workouts";
+                        }, 1500);
+                    } else {
+                        GymToast.fire({
+                            icon: 'error',
+                            title: 'Delete failed: ' + String(result)
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    GymToast.fire({
+                        icon: 'error',
+                        title: 'Server error occurred'
+                    });
+                }
+            });
+        }
+    });
+
+}
+
 //fetch data
 async function getExerciseData(){
    try{
@@ -21,8 +185,9 @@ initExerciseData();
 
 // get currentWorkouts
 const params = new URLSearchParams(window.location.search);
-const workoutID = params.get('id' ?? 0);
+const workoutID = params.get('id') ?? '0';
 console.log(workoutID);
+
 
 /* ============================================================
    ADD EXERCISE MODAL
@@ -168,12 +333,13 @@ function filterAELibrary() {
         item.className = 'ae-library-item';
         if (aeSelectedLibrary && aeSelectedLibrary.id === e.id) item.classList.add('selected');
         item.innerHTML = `
-            <div class="ae-item-emoji"><img src='${e.icon}'></div>
+            <div class="ae-item-emoji">${e.icon ? '<img src="' + e.icon + '">' : '<span class="material-icons" style="font-size:32px;color:var(--accent,#38BDF8)">fitness_center</span>'}</div>
             <div class="ae-item-info">
                 <div class="ae-item-name">${e.name}</div>
                 <div class="ae-item-muscle">${e.muscle}</div>
             </div>
-            <div class="ae-item-check">✓</div>
+            <div class="ae-item-check"><span class="material-icons">check</span></div>
+            <div class="ae-item-check">OK</div>
         `;
         item.addEventListener('click', () => selectAELibraryItem(e, item));
         list.appendChild(item);
@@ -189,13 +355,15 @@ function selectAELibraryItem(e, el) {
     el.classList.add('selected');
 
     const preview = document.getElementById('aeSelectedPreview');
-    document.getElementById('aePreviewName').innerHTML  = `✅ <img src="${e.icon}" class="ae-preview-icon" alt="${e.name}"> ${e.name}`;
+    document.getElementById('aePreviewName').innerHTML  = `<span class="material-icons" style="color:var(--success); vertical-align:middle; margin-right:4px">check_circle</span> ${e.icon ? '<img src="' + e.icon + '" class="ae-preview-icon" alt="' + e.name + '">' : '<span class="material-icons" style="font-size:20px;color:var(--accent,#38BDF8);vertical-align:middle">fitness_center</span>'} ${e.name}`;
+    document.getElementById('aePreviewName').innerHTML  = `OK ${e.icon ? '<img src="' + e.icon + '" class="ae-preview-icon" alt="' + e.name + '">' : '<span class="material-icons" style="font-size:20px;color:var(--accent,#38BDF8);vertical-align:middle">fitness_center</span>'} ${e.name}`;
     document.getElementById('aePreviewMuscle').textContent = e.muscle;
     preview.style.display = 'flex';
     currentExerciseID = e.exerciseID;
 
-    showAEModalTypeSection(e.type || 'strength');
-}
+    const typeMap = { 1: 'strength', 2: 'cardio', 3: 'bodyweight', 4: 'flexibility' };
+    showAEModalTypeSection(typeMap[e.typeID] || 'strength');
+    console.log(e.typeID)}
 
 function calcExerciseDuration(sets, reps, rest, repstime = 3) {
     let workTime = sets * reps * repstime;
@@ -220,8 +388,7 @@ function submitAddExercise() {
         }
 
         const ExerciseID   = currentExerciseID;
-        const exerciseType = aeSelectedLibrary.type || 'strength';
-
+        const exerciseType = aeSelectedLibrary.typeID || 1;
         const dataToSend = {
             action:     'add_exercise_to_workout',
             workoutId:  workoutID,
@@ -230,7 +397,7 @@ function submitAddExercise() {
 
         switch (exerciseType) {
 
-            case 'strength': {
+            case 1: {
                 const sets   = document.getElementById('aeSets').value.trim();
                 const reps   = document.getElementById('aeReps').value.trim();
                 const weight = document.getElementById('aeWeight').value.trim() || 0;
@@ -246,7 +413,7 @@ function submitAddExercise() {
                 break;
             }
 
-            case 'cardio': {
+            case 2: {
                 const duration = document.getElementById('aeDuration').value.trim();
                 const distance = document.getElementById('aeDistance').value.trim();
                 const typeID   = 2;
@@ -259,7 +426,7 @@ function submitAddExercise() {
                 break;
             }
 
-            case 'bodyweight': {
+            case 3: {
                 const sets   = document.getElementById('aeBWsets').value.trim();
                 const reps   = document.getElementById('aeBWreps').value.trim();
                 const rest   = document.getElementById('aeBWrest').value.trim();
@@ -274,7 +441,7 @@ function submitAddExercise() {
                 break;
             }
 
-            case 'flexibility': {
+            case 4: {
                 const duration = document.getElementById('aeFlexDuration').value.trim();
                 const hold     = document.getElementById('aeFlexHold').value.trim();
                 const typeID   = 4;
@@ -300,7 +467,7 @@ function submitAddExercise() {
                     const name = aeSelectedLibrary.name;
                     closeAddExerciseModal();
                     GymSwal.fire({ icon: 'success', title: `${name} added!`, showConfirmButton: false });
-                    setTimeout(() => { location.reload(); }, 2000);
+                    setTimeout(() => { location.reload(); }, 1500);
                 } else {
                     GymSwal.fire({ icon: 'error', title: 'Failed to add exercise.', text: response });
                 }
@@ -405,7 +572,7 @@ function submitAddExercise() {
             if (response.trim() === 'success') {
                 closeAddExerciseModal();
                 GymSwal.fire({ icon: 'success', title: 'Exercise added!', showConfirmButton: false });
-                setTimeout(() => { location.reload(); }, 2000);
+                setTimeout(() => { location.reload(); }, 5000);
             } else {
                 GymSwal.fire({ icon: 'error', title: 'Failed to add exercise.', text: response });
             }
@@ -436,6 +603,7 @@ let swRestSeconds = 0;
 
 function startWorkout() {
     swExercises = [];
+
     document.querySelectorAll('.exercise-card').forEach((card, idx) => {
         const name    = card.querySelector('.ex-name')?.textContent.trim() || 'Exercise';
         const muscle  = card.querySelector('.ex-muscle')?.textContent.trim() || '';
@@ -449,7 +617,7 @@ function startWorkout() {
         const hold     = details?.dataset.hold     || '';
         const reps     = details?.dataset.reps     || '10';
 
-        // Cardio & flexibility don't use sets — force 1 round so progress works
+        // Cardio & flexibility don't use sets - force 1 round so progress works
         let sets;
         if (type === 'cardio' || type === 'flexibility') {
             sets = 1;
@@ -532,9 +700,9 @@ function renderSWChecklist() {
 
             let infoText = '';
             if (ex.type === 'cardio') {
-                infoText = `${ex.duration} min${ex.distance ? ` · ${ex.distance} km` : ''}`;
+                infoText = `${ex.duration} min${ex.distance ? ` - ${ex.distance} km` : ''}`;
             } else if (ex.type === 'flexibility') {
-                infoText = `${ex.duration} min · Hold ${ex.hold}s`;
+                infoText = `${ex.duration} min - Hold ${ex.hold}s`;
             } else if (ex.type === 'bodyweight') {
                 infoText = `${ex.reps} reps <span style="font-size:11px;color:var(--text-muted)">(bodyweight)</span>`;
             } else {
@@ -554,7 +722,7 @@ function renderSWChecklist() {
                     </div>
                     <div class="sw-set-check${done ? ' checked' : ''}"
                          onclick="toggleSet(${ex.id}, ${s})"
-                         title="${done ? 'Mark undone' : 'Mark done'}">✓</div>
+                         title="${done ? 'Mark undone' : 'Mark done'}">${done ? '<span class="material-icons">check</span>' : ''}</div>
                 </div>`;
         }
 
@@ -567,7 +735,7 @@ function renderSWChecklist() {
                     </div>
                     <div class="sw-exercise-muscle">
                         ${escapeHtml(ex.muscle)}
-                        ${ex.rest && (ex.type === 'strength' || ex.type === 'bodyweight') ? ` · ${ex.rest}s rest` : ''}
+                        ${ex.rest && (ex.type === 'strength' || ex.type === 'bodyweight') ? ` - ${ex.rest}s rest` : ''}
                     </div>
                 </div>
                 <span class="sw-sets-done" id="sw-sets-label-${ex.id}">${ex.doneSets}/${ex.sets} ${rowLabel.toLowerCase()}s</span>
@@ -597,12 +765,20 @@ function toggleSet(exId, setNum) {
 
     if (isDone) {
         checkBtn?.classList.remove('checked');
+        if (checkBtn) {
+            checkBtn.innerHTML = '';
+            checkBtn.title = 'Mark done';
+        }
         row?.classList.remove('done');
         infoEl?.classList.remove('done-text');
         ex.doneSets = Math.max(0, ex.doneSets - 1);
         swDoneSets  = Math.max(0, swDoneSets - 1);
     } else {
         checkBtn?.classList.add('checked');
+        if (checkBtn) {
+            checkBtn.innerHTML = '<span class="material-icons">check</span>';
+            checkBtn.title = 'Mark undone';
+        }
         row?.classList.add('done');
         infoEl?.classList.add('done-text');
         ex.doneSets++;
@@ -629,7 +805,7 @@ function toggleSet(exId, setNum) {
         setTimeout(() => {
             GymSwal.fire({
                 icon:              'success',
-                title:             '🎉 Workout Complete!',
+                title:             'Workout Complete!',
                 text:              `Great job! You finished in ${formatTime(swSeconds)}.`,
                 confirmButtonText: 'Finish & Save'
             }).then(r => { if (r.isConfirmed) saveWorkoutCompletion(); });
@@ -736,7 +912,7 @@ function saveWorkoutCompletion() {
         success: function(response) {
             if (response.trim() === 'success') {
                 document.getElementById('StartWorkoutModal').classList.remove('active');
-                GymToast.fire({ icon: 'success', title: 'Workout saved! Great job 💪' });
+                GymToast.fire({ icon: 'success', title: 'Workout saved! Great job' });
                 const badge = document.getElementById('workoutStatus');
                 if (badge) { badge.textContent = 'Completed'; badge.className = 'status completed'; }
             }
@@ -847,14 +1023,14 @@ function saveEditExercise() {
         const weight = document.getElementById('eeWeight').value.trim() || 0;
         const rest   = document.getElementById('eeRest').value.trim()   || 0;
 
-        if (!sets || !reps) return GymSwall.fire({ icon: 'warning', title: 'Please fill Sets and Reps.' });
+        if (!sets || !reps) return GymSwal.fire({ icon: 'warning', title: 'Please fill Sets and Reps.' });
         payload = { ...payload, sets, reps, weight, rest };
 
     } else if (exerciseType === 'cardio') {
         const duration = document.getElementById('eeDuration').value.trim();
         const distance = document.getElementById('eeDistance').value.trim();
 
-        if (!duration || !distance) return GymSwall.fire({ icon: 'warning', title: 'Please fill Duration and Distance.' });
+        if (!duration || !distance) return GymSwal.fire({ icon: 'warning', title: 'Please fill Duration and Distance.' });
         payload = { ...payload, duration, distance };
 
     } else if (exerciseType === 'bodyweight') {
@@ -862,14 +1038,14 @@ function saveEditExercise() {
         const reps = document.getElementById('eeBWreps').value.trim();
         const rest = document.getElementById('eeBWrest').value.trim();
 
-        if (!sets || !reps) return GymSwall.fire({ icon: 'warning', title: 'Please fill Sets and Reps.' });
+        if (!sets || !reps) return GymSwal.fire({ icon: 'warning', title: 'Please fill Sets and Reps.' });
         payload = { ...payload, sets, reps, rest };
 
     } else if (exerciseType === 'flexibility') {
         const duration = document.getElementById('eeFlexDuration').value.trim();
         const hold     = document.getElementById('eeHold').value.trim();
 
-        if (!duration || !hold) return GymSwall.fire({ icon: 'warning', title: 'Please fill Duration and Hold.' });
+        if (!duration || !hold) return GymSwal.fire({ icon: 'warning', title: 'Please fill Duration and Hold.' });
         payload = { ...payload, duration, hold };
     }
 
@@ -880,104 +1056,69 @@ function saveEditExercise() {
         success: function(response) {
             if (response.trim() === 'success') {
                 closeEditExerciseModal();
-                GymSwall.fire({ icon: 'success', title: 'Exercise updated!' });
+                GymSwal.fire({ icon: 'success', title: 'Exercise updated!' });
                 setTimeout(() => { location.reload(); }, 1000);
             } else {
-                GymSwall.fire({ icon: 'error', title: 'Failed to update exercise', text: response });
+                GymSwal.fire({ icon: 'error', title: 'Failed to update exercise', text: response });
             }
         },
         error: function(xhr) {
             console.error(xhr);
-            GymSwall.fire({ icon: 'error', title: 'Server Error' });
+            GymSwal.fire({ icon: 'error', title: 'Server Error' });
         }
     });
 }
+function deleteExercise(id){
+    $.ajax({
+        url: "/workout_trackersys/controllers/WorkoutExercise.php",
+        type: "POST",
+        data: {
+            action: "delete",
+            workoutexerciseID: id
+        }, 
+        success: function(result) {
+            const normalized = String(result).trim().replace(/^"+|"+$/g, '').toLowerCase();
+            if (normalized === "success") { 
+                GymToast.fire({
+                    icon: 'success',
+                    title: 'Exercise deleted successfully'
+                });
+                
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                GymToast.fire({
+                    icon: 'error',
+                    title: 'Failed to delete exercise',
+                    text: String(result)
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            // Catches 404, 500, or network connection errors
+            GymToast.fire({
+                icon: 'error',
+                title: 'An error occurred',
+                text: error
+            });
+        }   
+    });
+}
 /* ============================================================
-   GYMSWAL & GYMTOAST (shared) - MUST BE DECLARED FIRST
+   LOGOUT FUNCTION
 ============================================================ */
-const GymSwal = Swal.mixin({
-    customClass: { container: 'swal-on-top' },
-    backdrop: 'rgba(0,0,0,0.5)',
-    didOpen: (popup) => {
-        popup.style.background     = 'rgba(9,9,121,0.95)';
-        popup.style.backdropFilter = 'blur(20px)';
-        popup.style.border         = '1px solid rgba(255,255,255,0.2)';
-        popup.style.borderRadius   = '20px';
-        popup.style.color          = '#ffffff';
-        popup.style.fontFamily     = 'Poppins, sans-serif';
-        const title = popup.querySelector('.swal2-title');
-        if (title) { title.style.color = '#fff'; title.style.fontFamily = 'Poppins, sans-serif'; }
-        const text = popup.querySelector('.swal2-html-container');
-        if (text) { text.style.color = 'rgba(255,255,255,0.8)'; }
-        const confirm = popup.querySelector('.swal2-confirm');
-        if (confirm) {
-            confirm.style.background   = 'linear-gradient(45deg,#38BDF8,#3B82F6)';
-            confirm.style.border       = 'none';
-            confirm.style.borderRadius = '50px';
-            confirm.style.fontFamily   = 'Poppins,sans-serif';
-            confirm.style.fontWeight   = '600';
+window.LogoutFunc = window.LogoutFunc || function() {
+    GymSwal.fire({
+        title: 'Leaving so soon?', icon: 'question', showCancelButton: true,
+        confirmButtonText: 'Yes, log out', cancelButtonText: 'Stay'
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.ajax({
+                url: '/workout_trackersys/controllers/logout.php',
+                type: 'POST',
+                success: () => window.location.href = '?page=login'
+            });
         }
-        const cancel = popup.querySelector('.swal2-cancel');
-        if (cancel) {
-            cancel.style.background   = 'rgba(255,255,255,0.15)';
-            cancel.style.color        = 'white';
-            cancel.style.border       = '1px solid rgba(255,255,255,0.2)';
-            cancel.style.borderRadius = '50px';
-            cancel.style.fontFamily   = 'Poppins,sans-serif';
-            cancel.style.fontWeight   = '600';
-        }
-    }
-});
- 
-const GymToast = Swal.mixin({
-    toast:              true,
-    position:           'top-end',
-    showConfirmButton:  false,
-    timer:              3000,
-    timerProgressBar:   true,
-    customClass: { container: 'swal-on-top' },
-    didOpen: (toast) => {
-        toast.style.background     = 'rgba(9,9,121,0.95)';
-        toast.style.backdropFilter = 'blur(20px)';
-        toast.style.border         = '1px solid rgba(255,255,255,0.2)';
-        toast.style.borderRadius   = '12px';
-        toast.style.color          = '#ffffff';
-        toast.addEventListener('mouseenter', Swal.stopTimer);
-        toast.addEventListener('mouseleave', Swal.resumeTimer);
-    }
-});
-
-const themeToggle = document.getElementById('themeToggle');
-const themeLabel = document.getElementById('theme-label');
-const thumb = document.querySelector('.toggle-thumb i');
-// APPLY SAVED THEME ON LOAD
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.checked = true;
-        themeLabel.textContent = 'Dark';
-        thumb.textContent = 'brightness_2';
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeToggle.checked = false;
-        themeLabel.textContent = 'Light';
-        thumb.textContent = 'brightness_5';
-    }
-});
-
-// TOGGLE CHANGE EVENT
-themeToggle.addEventListener('change', () => {
-    if (themeToggle.checked) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeLabel.textContent = 'Dark';
-        thumb.textContent = 'brightness_2';
-        localStorage.setItem('theme', 'dark');
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        themeLabel.textContent = 'Light';
-        thumb.textContent = 'brightness_5';
-        localStorage.setItem('theme', 'light');
-    }
-});
+    });
+};

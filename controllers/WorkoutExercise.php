@@ -1,7 +1,9 @@
 <?php 
 session_start();
 require_once '../BL/WorkoutExerciseManager.php';
+require_once '../BL/ActivityLogManager.php';
 $wem = new WorkoutExerciseManager();
+$activityLogs = new ActivityLogManager();
 $result = null;
 if(isset($_POST['action'])&& $_POST['action'] === 'add_exercise_to_workout'){
     $workoutID = $_POST['workoutId'];
@@ -30,9 +32,12 @@ if(isset($_POST['action'])&& $_POST['action'] === 'add_exercise_to_workout'){
         'hold' => $hold,
         'name' => $name,
         'typeID'=>$typeID,
+        'muscle'=>$muscle
 
     ]);
     if($result){
+        $exerciseName = $name ?: ('Exercise #' . $exerciseID);
+        $activityLogs->record((int)$userID, 'Workout Exercise Added', "Added '{$exerciseName}' to workout #{$workoutID}", 'success', (int)$workoutID, $exerciseID ? (int)$exerciseID : null);
         echo "success";
     }else{
         echo "Error";
@@ -43,9 +48,9 @@ if(isset($_POST['action'])&& $_POST['action'] === 'add_exercise_to_workout'){
 elseif(isset($_POST['action']) && $_POST['action'] === 'updateExercise'){
     $workoutExerciseId = $_POST['workoutExerciseId'] ?? null;
     $exerciseType = $_POST['exerciseType'] ?? 'strength';
+    $existingExercise = $workoutExerciseId ? $wem->getWorkoutExerciseById($workoutExerciseId) : false;
 
-    // DB columns in tbl_workout_exercises:
-    // sets, reps, weight, durationInMinutes, distance_km, holdTimeSec, rest
+   
     $sets = $_POST['sets'] ?? null;
     $reps = $_POST['reps'] ?? null;
     $weight = $_POST['weight'] ?? 0;
@@ -58,13 +63,6 @@ elseif(isset($_POST['action']) && $_POST['action'] === 'updateExercise'){
         echo "Error: Missing exercise ID";
         exit;
     }
-
-    // Controller/model currently supports only sets/reps/weight/duration.
-    // To keep behavior correct with your current model, we only update those fields here
-    // (and ignore type-specific fields in controller).
-    // You asked to match edit UI to exercise type; we do that by only validating required fields
-    // per type on frontend.
-
     // Strength needs sets+reps
     if($exerciseType === 'strength' && (!$sets || !$reps)){
         echo "Error: Missing sets or reps";
@@ -112,6 +110,11 @@ elseif(isset($_POST['action']) && $_POST['action'] === 'updateExercise'){
     );
 
     if($result){
+        $logUserID = (int)($existingExercise['userID'] ?? ($_SESSION['userID'] ?? 0));
+        $logWorkoutID = isset($existingExercise['workoutId']) ? (int)$existingExercise['workoutId'] : null;
+        $logExerciseID = isset($existingExercise['exerciseID']) ? (int)$existingExercise['exerciseID'] : null;
+        $exerciseName = $existingExercise['exerciseName'] ?? ('Workout exercise #' . $workoutExerciseId);
+        $activityLogs->record($logUserID, 'Workout Exercise Updated', "Updated '{$exerciseName}' in workout", 'success', $logWorkoutID, $logExerciseID ?: null);
         echo "success";
     }else{
         echo "Error: Failed to update exercise";
@@ -119,8 +122,9 @@ elseif(isset($_POST['action']) && $_POST['action'] === 'updateExercise'){
     exit;
 }
 
-elseif(isset($_POST['action']) && $_POST['action'] ==='Delete'){
-    $workoutexerciseID = $_POST['workoutExerciseID'] ?? null;
+elseif(isset($_POST['action']) && $_POST['action'] ==='delete'){
+    $workoutexerciseID = $_POST['workoutexerciseID'] ?? null;
+    $existingExercise = $workoutexerciseID ? $wem->getWorkoutExerciseById($workoutexerciseID) : false;
     if(!$workoutexerciseID){
         echo "ERROR: MISSING exercise ID";
         exit;
@@ -128,6 +132,10 @@ elseif(isset($_POST['action']) && $_POST['action'] ==='Delete'){
         $result = $wem->deleteExercise($workoutexerciseID);
     }
     if($result){
+        $logUserID = (int)($existingExercise['userID'] ?? ($_SESSION['userID'] ?? 0));
+        $logWorkoutID = isset($existingExercise['workoutId']) ? (int)$existingExercise['workoutId'] : null;
+        $exerciseName = $existingExercise['exerciseName'] ?? ('Workout exercise #' . $workoutexerciseID);
+        $activityLogs->record($logUserID, 'Workout Exercise Deleted', "Deleted '{$exerciseName}' from workout", 'success', $logWorkoutID);
         echo"success";
     }else{
         echo "Error: Failed to delete exercise";

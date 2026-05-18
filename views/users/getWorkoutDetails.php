@@ -1,17 +1,22 @@
 <?php
 require_once __DIR__ . '/../../BL/WorkoutManager.php';
 require_once __DIR__ . '/../../BL/WorkoutExerciseManager.php';
+require_once __DIR__ . '/../../BL/ExerciseManage.php';
+$em = new ExerciseManage();
+$muscle = $em->getMuscleGroups();
+$execircesType = $em->getExerciseType();
 $wm = new WorkoutManager();
 $wem = new WorkoutExerciseManager();
 $workoutDetails = $wm->getWorkoutDetails($_GET['id'] ?? 0);
 $workoutExercises = $wem->getWorkoutExercisesData($_GET['id'] ?? 0); // url query parameter
 $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Workout Details</title>
+    <title>GymTracker - Workout Details</title>
 
     <link rel="stylesheet" href="/workout_trackersys/assets/workoutdetails.css">
     <link rel="stylesheet" href="/workout_trackersys/assets/workoutdetailspatch.css">
@@ -19,11 +24,16 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="/workout_trackersys/assets/user-enhancements.css">    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
+
+
 
 <body>
 
 <div class="main-content">
+
+
 
     <!-- BACK BUTTON -->
     <div class="workout-details-top">
@@ -44,15 +54,15 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
 
         <div class="header-actions">
             <button class="btn blue" onclick="openAddExerciseModal()">
-                + Add Exercise
+                <i class="material-icons">add</i> Add Exercise
             </button>
 
             <button class="btn orange" onclick="EditWorkout(<?= $workoutDetails['workoutID'] ?>)">
-                Edit Workout
+                <i class="material-icons">edit</i> Edit Workout
             </button>
 
             <button class="btn red" onclick="DeleteWorkout(<?= $workoutDetails['workoutID'] ?>)">
-                Delete
+                <i class="material-icons">delete</i> Delete
             </button>
             <button class="btn green" onclick="startWorkout()">
                 <i class="material-icons">play_arrow</i> Start Workout
@@ -66,17 +76,17 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
 
         <div class="stat-card">
             <h5 id="exerciseCount"><?= $totalcards[0]["total_exercises"] ?? 0 ?></h5>
-            <span>Exercises</span>
+            <span><i class="material-icons" style="font-size:16px;vertical-align:middle">fitness_center</i> Exercises</span>
         </div>
 
         <div class="stat-card">
             <h5 id="totalSets"><?= $totalcards[0]["total_Sets"] ?? 0 ?></h5>
-            <span>Total Sets</span>
+            <span><i class="material-icons" style="font-size:16px;vertical-align:middle">repeat</i> Total Sets</span>
         </div>
 
         <div class="stat-card">
             <h5 id="duration"><?= $totalcards[0]["total_minutes"] ?? 0 ?> mins</h5>
-            <span>Duration</span>
+            <span><i class="material-icons" style="font-size:16px;vertical-align:middle">timer</i> Duration</span>
         </div>
 
     </div>
@@ -109,23 +119,23 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
             <?php 
             $type = strtolower($workex['exerciseType'] ?? 'strength');
             if($type === 'strength'): ?>
-                <span>Sets: <?= $workex['sets'] ?></span>
-                <span>Reps: <?= $workex['reps'] ?></span>
-                <span>Weight: <?= $workex['weight'] ?> kg</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">layers</i> Sets: <?= $workex['sets'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">repeat</i> Reps: <?= $workex['reps'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">fitness_center</i> Weight: <?= $workex['weight'] ?> kg</span>
             <?php elseif($type === 'cardio'): ?>
-                <span>Duration: <?= $workex['durationInMinutes'] ?> min</span>
-                <span>Distance: <?= $workex['distance_km'] ?> km</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">timer</i> Duration: <?= $workex['durationInMinutes'] ?> min</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">straighten</i> Distance: <?= $workex['distance_km'] ?> km</span>
             <?php elseif($type === 'bodyweight'): ?>
-                <span>Sets: <?= $workex['sets'] ?></span>
-                <span>Reps: <?= $workex['reps'] ?></span>
-                <span>Rest: <?= $workex['rest'] ?? 60 ?>s</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">layers</i> Sets: <?= $workex['sets'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">repeat</i> Reps: <?= $workex['reps'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">hourglass_empty</i> Rest: <?= $workex['rest'] ?? 60 ?>s</span>
             <?php elseif($type === 'flexibility'): ?>
-                <span>Duration: <?= $workex['durationInMinutes'] ?> min</span>
-                <span>Hold: <?= $workex['holdTimeSec'] ?>s</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">timer</i> Duration: <?= $workex['durationInMinutes'] ?> min</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">pause_circle</i> Hold: <?= $workex['holdTimeSec'] ?>s</span>
             <?php else: ?>
-                <span>Sets: <?= $workex['sets'] ?></span>
-                <span>Reps: <?= $workex['reps'] ?></span>
-                <span>Weight: <?= $workex['weight'] ?> kg</span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">layers</i> Sets: <?= $workex['sets'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">repeat</i> Reps: <?= $workex['reps'] ?></span>
+                <span><i class="material-icons" style="font-size:14px;vertical-align:middle">fitness_center</i> Weight: <?= $workex['weight'] ?> kg</span>
             <?php endif; ?>
         </div>
 
@@ -236,23 +246,19 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
                 <div class="ae-manual-field">
                     <label class="ae-label">Muscle Group</label>
                     <select id="manualMuscleGroup" class="ae-input browser-default">
-                        <option value="chest">Chest</option>
-                        <option value="back">Back</option>
-                        <option value="shoulders">Shoulders</option>
-                        <option value="legs">Legs</option>
-                        <option value="arms">Arms</option>
-                        <option value="core">Core</option>
-                        <option value="cardio">Cardio</option>
-                        <option value="full-body">Full Body</option>
+                        <option value="all" disabled> All</option>
+                        <?php foreach($muscle as $m):?>
+                        <option value="<?=  $m['muscleID'] ?>"><?= $m['muscle'] ?></option>
+                        <?php endforeach?>
                     </select>
                 </div>
                 <div class="ae-manual-field">
                     <label class="ae-label">Exercise Type</label>
                     <select id="manualExerciseType" class="ae-input browser-default" onchange="onManualTypeChange(this.value)">
-                        <option value="strength">Strength</option>
-                        <option value="bodyweight">Bodyweight</option>
-                        <option value="cardio">Cardio</option>
-                        <option value="flexibility">Flexibility</option>
+                        <?php foreach($execircesType as $e):?>
+                        <option value="<?= $e['description'] ?>"><?=$e['description']?></option>
+                        
+                        <?php endforeach?>
                     </select>
                 </div>
             </div>
@@ -269,22 +275,22 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
             <div class="ae-type-section" id="strengthFields">
                 <div class="ae-fields-grid ae-fields-4">
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">🔢</div>
+                        <div class="ae-field-icon"><i class="material-icons">layers</i></div>
                         <label>Sets</label>
                         <input type="number" id="aeSets" placeholder="3" min="1" max="20">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">🔁</div>
+                        <div class="ae-field-icon"><i class="material-icons">repeat</i></div>
                         <label>Reps</label>
                         <input type="number" id="aeReps" placeholder="10" min="1" max="100">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">⚖️</div>
+                        <div class="ae-field-icon"><i class="material-icons">fitness_center</i></div>
                         <label>Weight (kg)</label>
                         <input type="number" id="aeWeight" placeholder="0" min="0" max="500">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">⏱️</div>
+                        <div class="ae-field-icon"><i class="material-icons">hourglass_empty</i></div>
                         <label>Rest (sec)</label>
                         <input type="number" id="aeSeconds" placeholder="60" min="0" max="600">
                     </div>
@@ -295,12 +301,12 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
             <div class="ae-type-section" id="cardioFields" style="display:none">
                 <div class="ae-fields-grid ae-fields-2">
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">⏱️</div>
+                        <div class="ae-field-icon"><i class="material-icons">timer</i></div>
                         <label>Duration (min)</label>
                         <input type="number" id="aeDuration" placeholder="30" min="1" max="600">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">📏</div>
+                        <div class="ae-field-icon"><i class="material-icons">straighten</i></div>
                         <label>Distance (km)</label>
                         <input type="number" id="aeDistance" placeholder="5" step="0.1" min="0" max="1000">
                     </div>
@@ -311,17 +317,17 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
             <div class="ae-type-section" id="bodyweightFields" style="display:none">
                 <div class="ae-fields-grid ae-fields-3">
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">🔢</div>
+                        <div class="ae-field-icon"><i class="material-icons">layers</i></div>
                         <label>Sets</label>
                         <input type="number" id="aeBWsets" placeholder="3" min="1" max="20">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">🔁</div>
+                        <div class="ae-field-icon"><i class="material-icons">repeat</i></div>
                         <label>Reps</label>
                         <input type="number" id="aeBWreps" placeholder="12" min="1" max="100">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">⏱️</div>
+                        <div class="ae-field-icon"><i class="material-icons">hourglass_empty</i></div>
                         <label>Rest (sec)</label>
                         <input type="number" id="aeBWrest" placeholder="60" min="0" max="600">
                     </div>
@@ -332,12 +338,12 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
             <div class="ae-type-section" id="flexibilityFields" style="display:none">
                 <div class="ae-fields-grid ae-fields-2">
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">⏱️</div>
+                        <div class="ae-field-icon"><i class="material-icons">timer</i></div>
                         <label>Duration (min)</label>
                         <input type="number" id="aeFlexDuration" placeholder="10" min="1" max="120">
                     </div>
                     <div class="ae-field-card">
-                        <div class="ae-field-icon">🧘</div>
+                        <div class="ae-field-icon"><i class="material-icons">self_improvement</i></div>
                         <label>Hold Time (sec)</label>
                         <input type="number" id="aeFlexHold" placeholder="30" min="1" max="300">
                     </div>
@@ -538,6 +544,12 @@ $totalcards = $wem->getTotalCard($_GET['id'] ?? 0);
     </div>
 </div>
 
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span>Tracker</div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
 </body>
  <script src="/workout_trackersys/scripts/redirect.js"></script>
  <script src="/workout_trackersys/scripts/workoutdetails.js"></script>

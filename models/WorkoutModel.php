@@ -26,7 +26,7 @@ class WorkoutModel{
       $stmt->bindParam(":userID",$userID);
       $stmt->bindParam(":name",$workoutName);
        $stmt->bindParam(":workout_description",$workoutDescription);
-      return $stmt->execute();
+      return $stmt->execute() ? (int)$this->conn->lastInsertId() : false;
     }catch(PDOException $e){
       echo "Error" . $e->getMessage();
       return false;

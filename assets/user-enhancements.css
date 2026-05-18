@@ -1,0 +1,148 @@
+:root {
+    --brand-primary: #1f8a4c;
+    --brand-primary-2: #2fbf71;
+    --brand-ink: #0f172a;
+}
+
+body {
+    background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(47, 191, 113, 0.14), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(31, 138, 76, 0.12), transparent 55%),
+        #f7faf8;
+}
+
+[data-theme="dark"] body {
+    background: linear-gradient(-45deg, #020024, #090979, #0f3460);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+.main-content,
+.main-container {
+    animation: gymFadeUp 0.45s ease;
+}
+
+.workout-card,
+.goal-card,
+.card,
+.settings-box,
+.profile-card,
+.chart-card {
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.07);
+}
+
+@keyframes gymFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.gym-swal-popup,
+.gym-toast-popup {
+    background: color-mix(in srgb, var(--surface, #ffffff) 92%, transparent) !important;
+    border: 1px solid var(--border, #dbeafe) !important;
+    color: var(--text, #0f172a) !important;
+    box-shadow: 0 20px 48px rgba(2, 6, 23, 0.28) !important;
+}
+
+.gym-swal-popup {
+    border-radius: 18px !important;
+}
+
+.gym-toast-popup {
+    border-radius: 12px !important;
+}
+
+.gym-swal-title,
+.gym-toast-title {
+    color: var(--text, #0f172a) !important;
+    font-weight: 700 !important;
+}
+
+.gym-swal-text,
+.gym-toast-text {
+    color: var(--text-muted, #475569) !important;
+}
+
+.gym-swal-confirm,
+.swal2-styled.gym-swal-confirm {
+    background: linear-gradient(45deg, var(--accent-sky, #38bdf8), var(--accent, #3b82f6)) !important;
+    color: #fff !important;
+}
+
+.gym-swal-cancel,
+.swal2-styled.gym-swal-cancel {
+    background: var(--surface-2, #e8f0fe) !important;
+    color: var(--text, #0f172a) !important;
+    border: 1px solid var(--border, #dbeafe) !important;
+}
+
+
+/* ── Page Hero Banner ── */
+.page-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 24px;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: var(--radius, 12px);
+    background: linear-gradient(135deg, rgba(47,191,113,0.14), rgba(31,138,76,0.06)), var(--surface, #fff);
+    box-shadow: var(--shadow, 0 2px 8px rgba(0,0,0,.06));
+}
+.page-hero .section-kicker {
+    display: inline-flex;
+    margin-bottom: 6px;
+    color: var(--accent, #1f8a4c);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+}
+.page-hero h2 { margin: 0; color: var(--text, #0f172a); font-size: clamp(22px,2.4vw,30px); font-weight: 800; }
+.page-hero p  { max-width: 720px; margin: 8px 0 0; color: var(--text-muted, #475569); line-height: 1.6; }
+.page-hero .hero-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, #38BDF8, #3B82F6);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(56,189,248,0.30);
+}
+.page-hero .hero-icon .material-icons { font-size: 28px; }
+[data-theme="dark"] .page-hero {
+    background: linear-gradient(135deg, rgba(47,191,113,0.10), rgba(31,138,76,0.04)), var(--surface, #1e293b);
+}
+
+
+/* ── Light mode shadows ── */
+:root {
+    --shadow-card: 0 4px 20px rgba(9, 9, 121, 0.08), 0 1px 4px rgba(0,0,0,0.05);
+    --shadow-card-hover: 0 8px 32px rgba(59,130,246,0.18), 0 2px 8px rgba(0,0,0,0.07);
+}
+
+[data-theme="dark"] {
+    --shadow-card: 0 4px 20px rgba(0,0,0,0.35);
+    --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.card,
+.stat-card,
+.strip-card,
+.workout-card,
+.goal-card,
+.settings-box,
+.profile-card,
+.chart-card,
+.page-hero {
+    box-shadow: var(--shadow-card) !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover,
+.stat-card:hover,
+.workout-card:hover,
+.goal-card:hover {
+    box-shadow: var(--shadow-card-hover) !important;
+    transform: translateY(-2px);
+}

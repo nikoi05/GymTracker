@@ -966,3 +966,152 @@ body {
         justify-content: center;
     }
 }
+@media (max-width: 640px) {
+    footer,
+    .Sidebar.active ~ footer {
+        margin-left: 0;
+        padding: 24px 16px 22px;
+    }
+
+    .footer-brand {
+        width: 100%;
+        max-width: 260px;
+    }
+}
+
+/* ============================================================
+   WORKOUTS UI POLISH OVERRIDES
+============================================================ */
+.main-container {
+    max-width: 1220px;
+    margin: 0 auto;
+}
+
+.workout-wrap {
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+}
+
+.workout-header {
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.btn-add {
+    padding: 11px 20px;
+    border-radius: 999px;
+    letter-spacing: 0.2px;
+}
+
+.btn-add .material-icons {
+    font-size: 18px;
+}
+
+.workout-container {
+    padding: 12px 12px 4px;
+    border-radius: 14px;
+}
+
+#workoutTable thead th {
+    border-radius: 10px;
+}
+
+#workoutTable tbody td {
+    padding: 10px 6px !important;
+}
+
+.workout-card {
+    border-radius: 14px;
+    padding: 16px 18px;
+    background:
+        linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 70%, transparent), var(--surface-2));
+}
+
+.workout-card::after {
+    content: "";
+    position: absolute;
+    right: -38px;
+    top: -38px;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--accent-light) 75%, transparent);
+    pointer-events: none;
+}
+
+.card-header h3 {
+    font-size: 17px;
+    padding-right: 10px;
+}
+
+.workout-stats {
+    gap: 8px;
+}
+
+.stat-item {
+    padding: 5px 10px;
+    border-radius: 999px;
+}
+
+.card-body {
+    font-size: 12.5px;
+    max-width: 88ch;
+}
+
+.dt-search,
+.dataTables_filter {
+    margin-bottom: 12px !important;
+}
+
+.dt-input,
+.dataTables_filter input {
+    min-width: 210px;
+}
+
+.dt-container .dt-paging .dt-paging-button {
+    border-radius: 8px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    padding: 0 12px !important;
+}
+
+.modal .modal-content {
+    border-radius: 18px !important;
+}
+
+.modal-footer .btn-save,
+.modal-footer .btn-cancel {
+    border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+    .top-bar {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .workout-wrap {
+        padding: 14px;
+    }
+    .dt-input,
+    .dataTables_filter input {
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        padding: 20px 14px;
+    }
+    .title-header h2 {
+        font-size: 24px;
+    }
+    .workout-card {
+        padding: 14px;
+    }
+    .card-header {
+        gap: 8px;
+    }
+}

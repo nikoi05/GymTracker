@@ -1,6 +1,6 @@
 <?php 
-require_once '../BL/userManager.php';
-require_once '../BL/exerciseManage.php';
+require_once __DIR__ . '/../BL/userManager.php';
+require_once __DIR__ . '/../BL/exerciseManage.php';
 
 $em = new ExerciseManage();
 

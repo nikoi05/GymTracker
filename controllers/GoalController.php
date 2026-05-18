@@ -1,7 +1,9 @@
 <?php 
 
-require_once '../BL/GoalsManager.php';
+require_once __DIR__ . '/../BL/GoalsManager.php';
+require_once __DIR__ . '/../BL/ActivityLogManager.php';
 $gm = new GoalsManager();
+$activityLogs = new ActivityLogManager();
 session_start();
 
 if(isset($_POST['action'])&& $_POST['action']==="AddGoal"){
@@ -16,12 +18,13 @@ if(isset($_POST['action'])&& $_POST['action']==="AddGoal"){
 
     $result = $gm->AddGoals($userID,$goalName,$goalDesc,$goalCategory,$goalCurrent,$goalTarget,$goalDeadline,$status);
     if($result){
+        $activityLogs->record((int)$userID, 'Goal Created', "Created goal '{$goalName}'");
         echo "Success";
     }else{
         echo "Error";
     }
     exit;
-}else if($_POST['action'] && $_POST['action'] === "UpdateGoal"){
+}else if(isset($_POST['action']) && $_POST['action'] === "UpdateGoal"){
      $userID = $_SESSION['userID'];
      $goal_id=$_POST['goal_id'];
     $goalName = $_POST['name'];
@@ -34,27 +37,35 @@ if(isset($_POST['action'])&& $_POST['action']==="AddGoal"){
 
     $result = $gm->UpdateGoals($goal_id,$userID,$goalName,$goalDesc,$goalCategory,$goalCurrent,$goalTarget,$goalDeadline,$status);
     if($result){
+        $activityLogs->record((int)$userID, 'Goal Updated', "Updated goal '{$goalName}'");
         echo "Success";
     }else{
         echo "Error";
     }
     exit;
 
-}else if($_POST['action'] && $_POST['action'] === "MarkGoal"){
+}else if(isset($_POST['action']) && $_POST['action'] === "MarkGoal"){
     $userID = $_SESSION['userID'];
-    $goal_id=$_POST['goal_id'];
+     $goal_id=$_POST['goal_id'];
+     $goal = $gm->getGoalById($goal_id);
  $result = $gm->UpdateMark($userID,$goal_id);
     if($result){
+        $goalName = $goal['name'] ?? ('Goal #' . $goal_id);
+        $activityLogs->record((int)$userID, 'Goal Completed', "Marked goal '{$goalName}' as completed");
         echo "Success";
     }else{
         echo "Error";
     }
     exit;
 
-}else if($_POST['action'] && $_POST['action'] === "DeleteGoal"){
+}else if(isset($_POST['action']) && $_POST['action'] === "DeleteGoal"){
+    $userID = $_SESSION['userID'];
     $goal_id=$_POST['goal_id'];
+    $goal = $gm->getGoalById($goal_id);
  $result = $gm->DeleteGoal($goal_id);
     if($result){
+        $goalName = $goal['name'] ?? ('Goal #' . $goal_id);
+        $activityLogs->record((int)$userID, 'Goal Deleted', "Deleted goal '{$goalName}'");
         echo "Success";
     }else{
         echo "Error";

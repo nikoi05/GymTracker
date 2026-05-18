@@ -1,11 +1,29 @@
+    function ToggleSidebar() {
+     const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("active");
+  // Save the state based on the current class list
+  const isActive = sidebar.classList.contains('active');
+  localStorage.setItem('sidebar-state', isActive ? 'active' : 'inactive');
+  }
 const themeToggle = document.getElementById('themeToggle');
 const themeLabel = document.getElementById('theme-label');
 const thumb = document.querySelector('.toggle-thumb i');
 
 // APPLY SAVED THEME ON LOAD
 window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
+const savedStateToggle = localStorage.getItem('sidebar-state');
+  const sidebar = document.getElementById("sidebar");
 
+  // Only add the class if it was saved as 'active'
+  if (savedStateToggle === 'active') {
+      sidebar.classList.add('active');
+  } else {
+      sidebar.classList.remove('active');
+  }
+
+
+    // theme 
+    const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         themeToggle.checked = true;
@@ -33,10 +51,6 @@ themeToggle.addEventListener('change', () => {
         localStorage.setItem('theme', 'light');
     }
 });
-    /* ── Sidebar Toggle ── */
-    function ToggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
-    }
         /*- FETCH EXERCISE DATA FROM API -*/
     async function fetchExerciseData(){
         try{
@@ -87,7 +101,7 @@ function filterExercises() {
         const equipment = (exercise.equipment || '').toLowerCase();
         const location = (exercise.location || '').toLowerCase();
         const difficulty = (exercise.difficulty || '').toLowerCase();
-        const type = (exercise.type || '').toLowerCase();
+        const type = (exercise.type_name|| '').toLowerCase();
 
         const matchedFilter = activeFilter === 'all' || muscle === activeFilter;
         const matchedSearch = !query ||
@@ -112,14 +126,14 @@ function filterExercises() {
     }
 
     // FIXED: Use index parameter 'i'
-    filtered.forEach((e, i) => {  // ← Added 'i' parameter here
+    filtered.forEach((e, i) => {  // <- Added 'i' parameter here
         const card = document.createElement('div');
         card.className = 'exercise-card';
-        card.style.animationDelay = (i * 0.04) + 's';  // ← Now 'i' works
-
+        card.style.animationDelay = (i * 0.04) + 's';  // <- Now 'i' works
+        // if theres no icon we can use a fallback ternary operation some shi like  statement ? if true  :else fallback
         card.innerHTML = `
             <div class="exercise-card-top">
-                <div class="exercise-emoji"><img src="${e.icon}" alt="${e.name}"></div>
+                <div class="exercise-emoji">${e.icon ? '<img src="' + e.icon + '" alt="' + e.name + '">' : '<span class="material-icons" style="font-size:40px;color:var(--accent,#38BDF8)">fitness_center</span>'}</div>
                 <span class="muscle-badge muscle-${e.muscle}">${e.muscle.replace('-', ' ')}</span>
             </div>
             <div class="exercise-name">${e.name}</div>
@@ -128,9 +142,9 @@ function filterExercises() {
                 <span class="meta-tag"><span class="material-icons">fitness_center</span>${e.equipment}</span>
                 <span class="meta-tag"><span class="material-icons">location_on</span>${e.location}</span>
                 <span class="meta-tag"><span class="material-icons">signal_cellular_alt</span>${e.difficulty}</span>
-                <span class="meta-tag"><span class="material-icons">fitness_center</span>${e.type}</span>
+                <span class="meta-tag"><span class="material-icons">fitness_center</span>${e.type_name}</span>
 
-            <button class="exercise-card-btn">View Details →</button>
+            <button class="exercise-card-btn">View Details <span class="material-icons" style="font-size:16px; vertical-align:middle;">arrow_forward</span></button>
         `;
 
         // Card click handler
@@ -178,9 +192,9 @@ function openModal(id) {
     const e = exerciseData.find(x => x.exerciseID === id);
     if (!e) return console.error('Exercise not found:', id);
     currentID = id ; // get the current id for the add to workout panel
-    OpenformByType(e.type);
+    OpenformByType(e.type_name);
 
-    document.getElementById('modalEmoji').innerHTML = `<img src="${e.icon}" alt="${e.name}">`;
+    document.getElementById('modalEmoji').innerHTML = e.icon ? '<img src="' + e.icon + '" alt="' + e.name + '">' : '<span class="material-icons" style="font-size:48px;color:var(--accent,#38BDF8)">fitness_center</span>';
     document.getElementById('modalName').textContent = e.name;
     
     const mb = document.getElementById('modalMuscle');
@@ -208,8 +222,8 @@ function openModal(id) {
     let tags = [];
     if (Array.isArray(e.tags)) {
         tags = e.tags;
-    } else if (e.tag) {
-        tags = e.tag.split(',').map(t => t.trim()).filter(t => t);
+    } else if (e.tags) {
+        tags = e.tags.split(',').map(t => t.trim()).filter(t => t);
     }
     tagsEl.innerHTML = tags.map(t => `<span class="modal-tag">${t}</span>`).join('');
 
@@ -314,11 +328,11 @@ function closeModalDirect() {
             item.className = 'workout-select-item';
             item.dataset.id = w.workoutID; // Use actual workout ID from API data
             item.innerHTML = `
-                <div class="item-icon">🏋️</div>
+                <div class="item-icon"><span class="material-icons">fitness_center</span></div>
                 <div class="item-info">
                     <div class="item-name">${w.name}</div>
                 </div>
-                <div class="item-check">✓</div>
+                <div class="item-check"><span class="material-icons">check</span></div>
             `;
             item.addEventListener('click', () => selectWorkout(w.workoutID, item));
             list.appendChild(item);
@@ -334,7 +348,6 @@ function closeModalDirect() {
         // Select clicked
         el.classList.add('selected');
         selectedWorkoutId = id;
-        alert(selectedWorkoutId);
 
         // Show sets/reps/weight form
         document.getElementById('srwForm').classList.add('active');
@@ -416,10 +429,10 @@ function confirmAddToWorkout() {
         action: 'add_exercise_to_workout',
         workoutId: selectedWorkoutId,
         exerciseId: currentID,
-        durationTime: getExerciseDuration(exercise.type)
+        durationTime: getExerciseDuration(exercise.type_name)
     };
 
-    switch (exercise.type) {
+    switch (exercise.type_name) {
 
         case 'strength': {
             const sets = document.getElementById('inputSets').value.trim();
@@ -530,51 +543,56 @@ function confirmAddToWorkout() {
         }
     });
 }
-    /* ── GymSwal & GymToast ── */
-    const GymSwal = Swal.mixin({
-        backdrop: 'rgba(0,0,0,0.5)',
-        didOpen: (popup) => {
-            popup.style.background     = 'rgba(9,9,121,0.95)';
-            popup.style.backdropFilter = 'blur(20px)';
-            popup.style.border         = '1px solid rgba(255,255,255,0.2)';
-            popup.style.borderRadius   = '20px';
-            popup.style.color          = '#ffffff';
-            popup.style.fontFamily     = 'Poppins, sans-serif';
-            const title = popup.querySelector('.swal2-title');
-            if (title) { title.style.color = '#fff'; title.style.fontFamily = 'Poppins, sans-serif'; }
-            const confirm = popup.querySelector('.swal2-confirm');
-            if (confirm) { confirm.style.background = 'linear-gradient(45deg,#38BDF8,#3B82F6)'; confirm.style.border = 'none'; confirm.style.borderRadius = '50px'; confirm.style.fontFamily = 'Poppins,sans-serif'; confirm.style.fontWeight = '600'; }
-        }
-    });
+    /* -- GymSwal & GymToast -- */
+    const GymSwal = window.GymSwal || Swal.mixin({
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-swal-popup',
+        title: 'gym-swal-title',
+        htmlContainer: 'gym-swal-text',
+        confirmButton: 'gym-swal-confirm',
+        cancelButton: 'gym-swal-cancel'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    backdrop: 'rgba(2, 6, 23, 0.62)',
+    buttonsStyling: false
+});
 
-    const GymToast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.style.background     = 'rgba(9,9,121,0.95)';
-            toast.style.backdropFilter = 'blur(20px)';
-            toast.style.border         = '1px solid rgba(255,255,255,0.2)';
-            toast.style.borderRadius   = '12px';
-            toast.style.color          = '#ffffff';
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
+const GymToast = window.GymToast || Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-toast-popup',
+        title: 'gym-toast-title',
+        htmlContainer: 'gym-toast-text'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    didOpen: (t) => {
+        t.addEventListener('mouseenter', Swal.stopTimer);
+        t.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+});
+//logout func
+window.LogoutFunc = window.LogoutFunc || function() {
+    (window.GymSwal || Swal).fire({
+        title: 'Leaving so soon?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, log out',
+        cancelButtonText: 'Stay'
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.ajax({
+                url: '/workout_trackersys/controllers/logout.php',
+                type: 'POST',
+                success: () => window.location.href = '?page=login'
+            });
         }
     });
-//logout func
-function LogoutFunc(){
-    $.ajax({
-        url:"/workout_trackersys/controllers/logout.php",
-        type:"POST",
-        success: function(result){
-            if(result==="Success"){
-                window.location.href = "?page=login";
-            }
-        },
-        error: function(xhr,status, error){
-            console.error("LOGOUT FAILED" + error);
-        }
-    })
-}
+};

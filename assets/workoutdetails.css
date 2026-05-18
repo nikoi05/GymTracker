@@ -1177,6 +1177,7 @@ select.ae-input option { background: #090979; color: white; }
     display:flex;
     flex-direction:column;
     gap:16px;
+    z-index: 99;
 }
 
 /* ── Header ── */
@@ -1504,4 +1505,16 @@ select.ae-input option { background: #090979; color: white; }
     .sw-controls { flex-direction: column; }
     .sw-btn { width: 100%; justify-content: center; }
     .sw-header { flex-direction: column; gap: 12px; }
+}
+
+
+@media (max-width: 640px) {
+    footer {
+        padding: 24px 16px 22px;
+    }
+
+    .footer-brand {
+        width: 100%;
+        max-width: 260px;
+    }
 }

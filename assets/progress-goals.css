@@ -116,10 +116,21 @@
         
 .light-icon { color: #F59E0B; font-size: 14px !important; }
 .dark-icon  { color: #020024; font-size: 14px !important; }
-
         /* ── GymSwal ── */
         .swal-on-top { z-index:99999 !important; }
+
 
         @media(max-width:1100px) { .progress-grid { grid-template-columns:1fr; } .stats-row { grid-template-columns:repeat(2,1fr); } }
         @media(max-width:768px)  { .goals-grid { grid-template-columns:1fr; } .form-row { grid-template-columns:1fr; } }
         @media(max-width:480px)  { .stats-row { grid-template-columns:1fr 1fr; } .heatmap-grid { grid-template-columns:repeat(7,1fr); } }
+
+@media (max-width: 640px) {
+    footer {
+        padding: 24px 16px 22px;
+    }
+
+    .footer-brand {
+        width: 100%;
+        max-width: 260px;
+    }
+}

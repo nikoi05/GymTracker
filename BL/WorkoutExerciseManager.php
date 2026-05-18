@@ -18,6 +18,9 @@ class WorkoutExerciseManager{
     public function getWorkoutExercisesData($id){
         return $this->WorkoutExerciseModel->getWorkoutExercisesInfo($id);
     }
+    public function getWorkoutExerciseById($id){
+        return $this->WorkoutExerciseModel->getWorkoutExerciseById($id);
+    }
     public function getTotalCard($id){
         return $this->WorkoutExerciseModel->getTotalCards($id);
     }

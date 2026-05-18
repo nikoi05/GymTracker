@@ -1,0 +1,228 @@
+:root {
+    --surface: #ffffff;
+    --surface-2: #e8f0fe;
+    --border: #dbeafe;
+    --text: #020024;
+    --text-muted: #5b7baf;
+    --accent: #3b82f6;
+    --accent-sky: #38bdf8;
+}
+
+[data-theme="dark"] {
+    --surface: rgba(255,255,255,0.07);
+    --surface-2: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.12);
+    --text: #f1f5f9;
+    --text-muted: rgba(255,255,255,0.55);
+    --accent: #38bdf8;
+    --accent-sky: #38bdf8;
+}
+
+footer {
+    margin-top: 28px;
+    padding: 22px 18px;
+    text-align: center;
+    position: relative;
+    background: #0f172a;
+    border-top: 1px solid var(--border, #dbeafe);
+}
+
+footer .footer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+footer .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 5px;
+}
+
+footer .footer-copyright {
+    font-size: 12px;
+    color: var(--text-muted, #5b7baf);
+    line-height: 1.4;
+}
+
+footer .footer-brand .brand-gym {
+    background: linear-gradient(45deg, #38bdf8, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] footer {
+    background: rgba(255,255,255,0.04);
+    border-top: 1px solid rgba(255,255,255,0.10);
+}
+
+
+.Sidebar .sidebar-brand {
+    display: flex;
+    align-items: center;
+    padding: 4px 20px 12px;
+    color: #e2e8f0;
+}
+
+.Sidebar .sidebar-brand i.material-icons {
+    min-width: 24px;
+    font-size: 22px;
+    color: #7dd3fc;
+}
+
+.Sidebar .sidebar-brand .sidebar-logo {
+    min-width: 24px;
+    font-size: 19px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Sidebar .sidebar-brand .text {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.Sidebar .sidebar-brand .text .brand-gym {
+    background: linear-gradient(45deg, #38bdf8, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.Sidebar .sidebar-theme {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 10px 12px;
+    padding: 10px 10px;
+    background: transparent;
+    backdrop-filter: none;
+
+}
+  
+.Sidebar .sidebar-theme .toggle-label {
+    color: #dbeafe;
+    font-size: 12px;
+    opacity: 0;
+    transition: 0.25s ease;
+    font-weight: 600;
+    min-width: 36px;
+}
+
+.Sidebar.active .sidebar-theme .toggle-label {
+    opacity: 1;
+}
+
+.Sidebar .sidebar-theme .toggle {
+    width: 54px;
+    height: 30px;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.Sidebar .sidebar-theme .toggle input {
+    display: none;
+}
+
+.Sidebar .sidebar-theme .toggle-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #93c5fd 0%, #38bdf8 55%, #0ea5e9 100%);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    transition: all 0.25s ease;
+}
+
+.Sidebar .sidebar-theme .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #f59e0b;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.Sidebar .sidebar-theme .toggle-thumb i {
+    font-size: 13px;
+}
+
+.Sidebar .sidebar-theme .toggle input:checked + .toggle-track {
+    background:
+        radial-gradient(circle at 22% 35%, rgba(255,255,255,0.85) 1px, transparent 2px),
+        radial-gradient(circle at 52% 24%, rgba(255,255,255,0.72) 1px, transparent 2px),
+        radial-gradient(circle at 78% 66%, rgba(255,255,255,0.65) 1px, transparent 2px),
+        linear-gradient(90deg, #0f172a 0%, #1e3a8a 55%, #312e81 100%);
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
+.Sidebar .sidebar-theme .toggle input:checked ~ .toggle-thumb {
+    left: 29px;
+    background: #fde047;
+    color: #f59e0b;
+}
+
+.Sidebar:not(.active) .sidebar-theme {
+    width: 46px;
+    padding: 8px 6px;
+    margin: 8px auto 12px;
+    gap: 0;
+    justify-content: center;
+}
+
+.Sidebar:not(.active) .sidebar-theme .toggle-label {
+    display: none;
+    min-width: 0;
+}
+
+footer .footer-brand .brand-gym {
+    background: linear-gradient(45deg, #38bdf8, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.Sidebar:not(.active) .sidebar-theme .toggle {
+    width: 30px;
+    height: 30px;
+}
+
+.Sidebar:not(.active) .sidebar-theme .toggle-track {
+    display: none;
+}
+
+.Sidebar:not(.active) .sidebar-theme .toggle-thumb {
+    position: static;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background:#0ea5e9;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: none;
+}
+.Sidebar:not(.active) .sidebar-theme .toggle-thumb:hover {
+    background: linear-gradient(45deg, #38bdf8, #3b82f6);
+    color: #ffffff;
+}
+
+
+.Sidebar:not(.active) .sidebar-theme .toggle input:checked ~ .toggle-thumb {
+    left: auto;
+    background: #fde047;
+    color: #f59e0b;
+}

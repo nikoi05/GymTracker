@@ -34,7 +34,20 @@
 
 .profile-edit {
     padding: 24px 0;
+    margin-right: 24px;
 }
+select.browser-default{
+    color:#0f172a !important;
+    background-color: #38BDF8 !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
+}
+/* Limited styling for options */
+select.browser-default option {
+  background-color:#090979 !important;
+  color: #ffffff !important;
+  padding: 10px; /* Only works in some browsers */
+}
+
 
 .form-group {
     margin-bottom: 20px;
@@ -133,3 +146,489 @@
 .onboarding-view {
     padding: 20px 0;
 }
+
+@media (max-width: 640px) {
+    footer {
+        padding: 24px 16px 22px;
+    }
+
+    .footer-brand {
+        width: 100%;
+        max-width: 260px;
+    }
+}
+
+/* ============================================================
+   PROFILE + SETTINGS REFRESH
+   ============================================================ */
+.main-content {
+    padding: 28px;
+}
+
+.main-container {
+    background: transparent;
+    padding: 0;
+}
+
+.top-bar {
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.greeting h3 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.greeting h5 {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.profile-hero,
+.settings-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(59, 130, 246, 0.06)),
+        var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.profile-avatar-large,
+.settings-hero-icon {
+    width: 74px;
+    height: 74px;
+    flex: 0 0 74px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-grad);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(59, 130, 246, 0.28);
+}
+
+.profile-avatar-large {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.settings-hero-icon i {
+    font-size: 34px;
+}
+
+.profile-hero-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.section-kicker {
+    display: inline-flex;
+    margin-bottom: 5px;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+}
+
+.profile-hero h1,
+.settings-hero h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+}
+
+.profile-hero p,
+.settings-hero p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.profile-hero-meta {
+    min-width: 190px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    text-align: right;
+}
+
+.profile-hero-meta span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-hero-meta strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.profile-layout,
+.settings-layout {
+    gap: 18px;
+}
+
+.profile-panel,
+.settings-panel {
+    position: relative;
+    overflow: hidden;
+    padding: 24px !important;
+    border-radius: var(--radius);
+}
+
+.profile-panel::before,
+.settings-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--accent-grad);
+}
+
+.card-header {
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.card-subtitle {
+    margin: 5px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.profile-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0;
+}
+
+.info-row {
+    min-height: 76px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.value {
+    width: 100%;
+    color: var(--text);
+    text-align: left;
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.profile-edit {
+    padding: 0;
+}
+
+#profileForm,
+#onboardingForm,
+#passwordForm {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px
+}
+
+#onboardingForm .form-row,
+#profileForm .form-row,
+#passwordForm .form-row,
+#onboardingForm .full-field,
+#passwordForm .form-group {
+    grid-column: 1 / -1;
+}
+
+.form-group {
+    min-width: 0;
+    margin: 10px;
+}
+
+.form-group label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100% !important;
+    min-height: 46px;
+    margin: 0;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    background: rgba(255,255,255,0.12) !important;
+    color: var(--text) !important;
+    padding: 0 13px !important;
+    box-shadow: none !important;
+    font-size: 14px;
+}
+
+
+.form-group textarea {
+    min-height: 96px;
+    padding-top: 12px !important;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-light) !important;
+}
+
+.form-row {
+    align-items: center;
+    margin-top: 4px;
+}
+
+.btn-primary,
+.btn-ghost,
+.edit-onboarding-btn {
+    min-height: 44px;
+    border-radius: 999px;
+    padding: 0 18px;
+}
+
+.icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.icon-action i {
+    font-size: 18px;
+}
+
+.fitness-card {
+    background:
+        linear-gradient(135deg, rgba(34, 197, 94, 0.10), rgba(56, 189, 248, 0.08)),
+        var(--surface);
+}
+
+.onboarding-section {
+    padding-top: 2px;
+}
+
+.onboarding-view {
+    padding: 0;
+}
+
+.preferences-section {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.preferences-section > div {
+    min-height: 82px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.preferences-section strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+.preferences-list {
+    margin-top: 10px;
+}
+
+.pref-tag {
+    border: 1px solid rgba(34, 197, 94, 0.20);
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.10);
+    color: #16A34A;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.no-data {
+    margin: 0;
+    padding: 18px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    color: var(--text-muted);
+    background: var(--surface-2);
+}
+
+.settings-hero {
+    justify-content: space-between;
+}
+
+.settings-hero > div:first-child {
+    max-width: 680px;
+}
+
+.password-panel {
+    max-width: 760px;
+}
+
+.settings-toggles {
+    gap: 12px;
+}
+
+.toggle-item {
+    min-height: 76px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface-2);
+}
+
+.toggle-copy {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toggle-copy i {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 21px;
+}
+
+.toggle-copy strong {
+    display: block;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.toggle-copy span {
+    display: block;
+    margin-top: 3px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.toggle.small {
+    flex: 0 0 44px;
+}
+
+[data-theme="dark"] .profile-hero,
+[data-theme="dark"] .settings-hero,
+[data-theme="dark"] .profile-hero-meta,
+[data-theme="dark"] .preferences-section > div {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(14px);
+}
+
+[data-theme="dark"] .pref-tag {
+    color: #4ADE80;
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    .profile-hero,
+    .settings-hero,
+    .card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .profile-hero-meta {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+@media (max-width: 720px) {
+    .profile-info,
+    #profileForm,
+    #onboardingForm,
+    #passwordForm,
+    .preferences-section {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-primary,
+    .btn-ghost,
+    .edit-onboarding-btn {
+        width: 100%;
+    }
+
+    .profile-panel,
+    .settings-panel,
+    .profile-hero,
+    .settings-hero {
+        padding: 20px !important;
+    }
+}
+
+
+/* ── Password toggle ── */
+.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper input { flex: 1; padding-right: 40px; }
+.input-wrapper .material-icons { position: absolute; right: 10px; cursor: pointer; color: var(--text-muted); font-size: 20px; user-select: none; }
+.input-wrapper .material-icons:hover { color: var(--text); }
