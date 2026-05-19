@@ -18,12 +18,12 @@ class UserModel{
             return;
         }   
         try{
-            $sqlQuery ="INSERT INTO tbl_users (username, email, password, gender, day_of_birth,created_At,updated_At) VALUES (:username, :email, :password, :gender, :day_of_birth, NOW(), NOW())";
+            $sqlQuery ="INSERT INTO tbl_users (username, email, password, genderID, day_of_birth,created_At,updated_At) VALUES (:username, :email, :password, :genderID, :day_of_birth, NOW(), NOW())";
             $stmt = $this->conn->prepare($sqlQuery);
             $stmt->bindParam(':username', $username);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password',$hashedPassword);
-            $stmt->bindParam(':gender', $gender);
+            $stmt->bindParam(':genderID', $gender);
             $stmt->bindParam(':day_of_birth', $dateofBirth);
              return $stmt->execute();
         }catch(PDOException $e){
@@ -36,29 +36,133 @@ class UserModel{
 
 
 public function LoginFunc($email, $password){ // NOTE: IN THE USERMODEL WE VALIDATE THE LOGIN AND WE RETURN A BOOLEAN AJAX WILL
-    if(session_status() == PHP_SESSION_NONE){       // HANDLE THE REST, MOREOVER< IMPORTANT WE MUST UNSET THE SESSION IF THE LOGIN FAILED,
-        session_regenerate_id(true);                               // BEFORE WE VALIDATE WE MUST CHECK IF THEIRE IS A SESSION ACTIVE.
-        session_start();
-    }
     try{
         $user = $this->getUserByEmail($email);
-        if($user && password_verify($password, $user['password'])){
-            session_regenerate_id(true);
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['userID'] = $user['userID'];
-            $_SESSION['profileLevel'] =$user['profileLevel'];
-            $_SESSION['username'] = $user['username'];
-            return true;
-        }else{
-            echo "Invalid email or password.";
-            session_unset();
-            return false;
-        }
+
+        return $user;
+        
     }catch(PDOException $e){
     echo "Error: " . $e->getMessage();
-    return false;
+    return [];
 }
 }
+
+
+
+/*=========================================================================
+                         LOGIN ATTEMPTS 
+===========================================================================*/
+//check if email is locked
+public function isLocked($email){
+    try{
+        $stmt =$this->conn->prepare("SELECT locked_until from tbl_login_attempts WHERE email = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if($result && $result['locked_until']){
+            if(strtotime($result['locked_until']) > time()){
+                return true;
+            }
+        }
+        return false;
+
+    }catch(PDOException $e){
+        echo "Error: " . $e->getMessage();
+        return false;
+    
+    }
+}
+
+public function recordAttempts($email)
+{
+    try {
+
+        $stmt = $this->conn->prepare("
+            SELECT attempts 
+            FROM tbl_login_attempts 
+            WHERE email = :email
+        ");
+
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Existing record
+        if ($result) {
+
+            $attempts = $result['attempts'] + 1;
+
+            $lockeduntil = null;
+
+            // Lock after 5 attempts
+            if ($attempts >= 5) {
+
+                $lockeduntil = date(
+                    'Y-m-d H:i:s',
+                    strtotime('+15 minutes')
+                );
+            }
+
+            $updateState = $this->conn->prepare("
+                UPDATE tbl_login_attempts 
+                SET attempts = :attempts,
+                    locked_until = :lockeduntil
+                WHERE email = :email
+            ");
+
+            $updateState->bindParam(':attempts', $attempts);
+            $updateState->bindParam(':lockeduntil', $lockeduntil);
+            $updateState->bindParam(':email', $email);
+
+            $updateState->execute();
+
+        } else {
+
+            // First failed attempt
+            $insert = $this->conn->prepare("
+                INSERT INTO tbl_login_attempts (
+                    email,
+                    attempts
+                )
+                VALUES (
+                    :email,
+                    :attempts
+                )
+            ");
+
+            $attempt = 1;
+
+            $insert->bindParam(':email', $email);
+            $insert->bindParam(':attempts', $attempt);
+
+            $insert->execute();
+        }
+
+        return true;
+
+    } catch(PDOException $e) {
+
+        error_log($e->getMessage());
+
+        return false;
+    }
+}
+//if successfully login
+public function resetAttempts($email){
+    try{
+        $reset = $this->conn->prepare("DELETE FROM tbl_login_attempts WHERE email = :email");
+        $reset->bindParam(':email', $email);
+        $reset->execute();
+        return true;
+
+    }catch(PDOException $e){
+        echo "Error: " . $e->getMessage();
+        return false;
+    }
+}
+
+
 public function updateProfileLevel($userID){
     try{
         $sqlUpdate ="UPDATE tbl_users SET profileLevel =1 WHERE userID = :userID";
@@ -76,7 +180,19 @@ public function updateProfileLevel($userID){
 }
 public function getUserByEmail($email){
     try{
-        $sqlQuery = "SELECT userID ,username,email, password,profileLevel FROM tbl_users WHERE email = :email";
+        $sqlQuery = "SELECT u.userID,
+         u.username,
+         u.email,
+          u.password,
+          u.profileLevel,
+          last_activity,
+          u.created_At,
+          u.updated_At,
+          g.gender
+           FROM tbl_users u
+           LEFT JOIN
+           tbl_gender g on g.genderID = u.genderID
+           WHERE email = :email;";
         $stmt = $this->conn->prepare($sqlQuery);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
@@ -89,7 +205,20 @@ public function getUserByEmail($email){
 
 public function getUserByID($userID){
     try{
-        $sqlQuery = "SELECT userID, username, email, gender, day_of_birth, profileLevel, last_activity, created_At, updated_At FROM tbl_users WHERE userID = :userID";
+        $sqlQuery = "SELECT u.userID,
+         u.username,
+         u.email,
+          u.password,
+          u.day_of_birth,
+          u.profileLevel,
+          u.last_activity,
+          u.created_At,
+          u.updated_At,
+          g.gender
+           FROM tbl_users u
+           LEFT JOIN
+           tbl_gender g on g.genderID = u.genderID
+           WHERE userID = :userID;";
         $stmt = $this->conn->prepare($sqlQuery);
         $stmt->bindParam(':userID', $userID);
         $stmt->execute();
@@ -146,10 +275,21 @@ public function countUsers(){
 }
 public function readUsers(){
     try{
-        $sqlQuery = "SELECT * FROM tbl_users INNER JOIN tbl_roles ON tbl_users.profileLevel = tbl_roles.roleID";
+        $sqlQuery = "SELECT * FROM tbl_users INNER JOIN tbl_roles ON tbl_users.profileLevel = tbl_roles.roleID INNER JOIN tbl_gender ON tbl_users.genderID=tbl_gender.genderID";
         $stmt = $this->conn->prepare($sqlQuery);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }catch(PDOException $e){
+        echo "Error: " . $e->getMessage();
+    }
+}
+public function getGender(){
+    try{
+        $sql = "SELECT * FROM tbl_gender";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     }catch(PDOException $e){
         echo "Error: " . $e->getMessage();
     }
@@ -169,7 +309,7 @@ public function updateUserDetails($userID, $username, $password, $email, $gender
         // Start building query
         $sqlQuery = "UPDATE tbl_users SET 
             username = :username,
-            gender = :gender,
+            genderID = :gender,
             day_of_birth = :dateofBirth,
             profileLevel = :role,
             updated_At = NOW()";
@@ -287,5 +427,60 @@ public function getuserMonthly(){
         return[];
     }
 }
+public function readRoles(){
+    try{
+        $sqlQuery = "SELECT * FROM tbl_roles";
+        $stmt = $this->conn->prepare($sqlQuery);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }catch(PDOException $e){
+        echo "Error: " . $e->getMessage();
+    }
+}
+ public function updateProfile($userID,$username,$gender,$dob,$email){
+      try {
+        // Get current email
+        $checkQuery = "SELECT email FROM tbl_users WHERE userID = :userID";
+        $stmt = $this->conn->prepare($checkQuery);
+        $stmt->bindParam(':userID', $userID);
+        $stmt->execute();
+        $currentUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $currentEmail = $currentUser['email'];
+
+        // Start building query
+        $sqlQuery = "UPDATE tbl_users SET 
+            username = :username,
+            genderID = :gender,
+            day_of_birth = :dateofBirth,
+            updated_At = NOW()";
+
+        // Only update email if changed
+        if ($email !== $currentEmail) {
+            $sqlQuery .= ", email = :email";
+        }
+
+        $sqlQuery .= " WHERE userID = :userID";
+
+        $stmt = $this->conn->prepare($sqlQuery);
+
+        // Bind required fields
+        $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':gender', $gender);
+        $stmt->bindParam(':dateofBirth', $dob);
+        $stmt->bindParam(':userID', $userID);
+
+        // Bind optional fields
+        if ($email !== $currentEmail) {
+            $stmt->bindParam(':email', $email);
+        }
+        return $stmt->execute();
+
+    } catch(PDOException $e) {
+        echo "Error: " . $e->getMessage();
+        return false;
+    }
+}
+
 }
 ?>

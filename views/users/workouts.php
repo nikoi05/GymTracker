@@ -27,13 +27,16 @@ $workouts=$wm->readWorkouts($userID);
     <!--- DATATABLE--->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
     <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
-    <title>Document</title>
+    <title>GymTracker - My Workouts</title>
+    <link rel="stylesheet" href="/workout_trackersys/assets/user-enhancements.css">    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
 <body>
+<script src="/workout_trackersys/assets/animations-observer.js"></script>
+
     <div class="Sidebar" id="sidebar">
     <div class="NavLinks">
-        <button class="toggle-btn" onclick="ToggleSidebar()">☰</button>
-        <span class="text">WorkoutTracker</span>
+        <button class="toggle-btn" onclick="ToggleSidebar()"><i class="material-icons">menu</i></button>
+        <div class="sidebar-brand"><span class="sidebar-logo" aria-hidden="true">&#128170;</span><span class="text"><span class="brand-gym">Gym</span>Tracker</span></div>
         <ul>
             <li  onclick="redirectUser(1)">
                 <i class="material-icons icon">dashboard</i>
@@ -73,7 +76,15 @@ $workouts=$wm->readWorkouts($userID);
         </ul>
     </div>
 
-    <div class="Logout">  
+        <div class="sidebar-theme">
+        <span class="toggle-label" id="theme-label">Light</span>
+        <label class="toggle">
+            <input type="checkbox" id="themeToggle">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"><i class="material-icons">brightness_5</i></div>
+        </label>
+    </div>
+<div class="Logout">  
         <button type="button" onclick="LogoutFunc()">
             <i class="material-icons">logout</i>
             <span class="text">Logout</span>
@@ -85,25 +96,18 @@ $workouts=$wm->readWorkouts($userID);
     <!-- MAIN CONTENT -->
     <div class="main-content">
         <div class="main-container">
-            <div class="top-bar">
-                <div class="title-header">
+            <section class="page-hero">
+                <div>
+                    <span class="section-kicker">Training Plans</span>
                     <h2>My Workouts</h2>
-                    <h5>Check Your Workouts, Add or Remove</h5>
+                    <p>Build, manage, and track your personal workout plans.</p>
                 </div>
-                <div class="toggle-wrap">
-                    <span class="toggle-label" id="theme-label">Light</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="themeToggle">
-                        <div class="toggle-track"></div>
-                        <div class="toggle-thumb"><i class="material-icons light-icon">brightness_5</i></div>
-                    </label>
-                </div>
-            </div>
-            
+                <div class="hero-icon"><i class="material-icons">fitness_center</i></div>
+            </section>
            <section class="main">
                 <div class="workout-wrap">
     <div class="workout-header">
-        <button class="btn-add" onclick="openModal();">+ Add Workout</button>
+        <button class="btn-add" onclick="openModal();"><span class="material-icons">add</span> Add Workout</button>
     </div>
 
     <div class="workout-container">
@@ -153,8 +157,10 @@ $workouts=$wm->readWorkouts($userID);
     </div>
 </div>
 </section>
-</div>
-<div class="modal" id="addWorkoutModal">
+        </div>
+    </div>
+
+    <div class="modal" id="addWorkoutModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div>
@@ -183,9 +189,18 @@ $workouts=$wm->readWorkouts($userID);
                 </div>
             </form>
         </div>
+    </div>
 
-    <!-- Scripts at the bottom -->
+   
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span>Tracker</div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
+</body>
+ <!-- Scripts at the bottom -->
     <script src="/workout_trackersys/scripts/redirect.js"></script>
     <script src="/workout_trackersys/scripts/workouts.js"></script>
-</body>
 </html>

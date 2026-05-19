@@ -17,6 +17,9 @@ class GoalsManager{
     public function readGoals($userID){
         return $this->goalsModel->readGoals($userID);
     }
+    public function getGoalById($goalID){
+        return $this->goalsModel->getGoalById($goalID);
+    }
     public function UpdateGoals($goalID,$userID,$goalName,$goalDesc,$goalCategory,$goalCurrent,$goalTarget,$goalDeadline,$status){
         return $this->goalsModel->UpdateGoals($goalID,$userID,$goalName,$goalDesc,$goalCategory,$goalCurrent,$goalTarget,$goalDeadline,$status);
     }
@@ -29,10 +32,9 @@ class GoalsManager{
     public function GetGoalsInfos($userID){
         return $this->goalsModel->GetGoalsInfos($userID);
     }
-
-
-
-
+    public function getCategories(){
+        return $this->goalsModel->getCategories();
+    }
 }
 
 

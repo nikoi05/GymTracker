@@ -1,67 +1,78 @@
-function ToggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("active");
+    function ToggleSidebar() {
+     const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("active");
+  // Save the state based on the current class list
+  const isActive = sidebar.classList.contains('active');
+  localStorage.setItem('sidebar-state', isActive ? 'active' : 'inactive');
   }
 
 /* ============================================================
    GYMSWAL & GYMTOAST (shared) - MUST BE DECLARED FIRST
 ============================================================ */
-const GymSwal = Swal.mixin({
-    customClass: { container: 'swal-on-top' },
-    backdrop: 'rgba(0,0,0,0.5)',
-    didOpen: (popup) => {
-        popup.style.background     = 'rgba(9,9,121,0.95)';
-        popup.style.backdropFilter = 'blur(20px)';
-        popup.style.border         = '1px solid rgba(255,255,255,0.2)';
-        popup.style.borderRadius   = '20px';
-        popup.style.color          = '#ffffff';
-        popup.style.fontFamily     = 'Poppins, sans-serif';
-        const title = popup.querySelector('.swal2-title');
-        if (title) { title.style.color = '#fff'; title.style.fontFamily = 'Poppins, sans-serif'; }
-        const text = popup.querySelector('.swal2-html-container');
-        if (text) { text.style.color = 'rgba(255,255,255,0.8)'; }
-        const confirm = popup.querySelector('.swal2-confirm');
-        if (confirm) {
-            confirm.style.background   = 'linear-gradient(45deg,#38BDF8,#3B82F6)';
-            confirm.style.border       = 'none';
-            confirm.style.borderRadius = '50px';
-            confirm.style.fontFamily   = 'Poppins,sans-serif';
-            confirm.style.fontWeight   = '600';
-        }
-        const cancel = popup.querySelector('.swal2-cancel');
-        if (cancel) {
-            cancel.style.background   = 'rgba(255,255,255,0.15)';
-            cancel.style.color        = 'white';
-            cancel.style.border       = '1px solid rgba(255,255,255,0.2)';
-            cancel.style.borderRadius = '50px';
-            cancel.style.fontFamily   = 'Poppins,sans-serif';
-            cancel.style.fontWeight   = '600';
-        }
+const GymSwal = window.GymSwal || Swal.mixin({
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-swal-popup',
+        title: 'gym-swal-title',
+        htmlContainer: 'gym-swal-text',
+        confirmButton: 'gym-swal-confirm',
+        cancelButton: 'gym-swal-cancel'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    backdrop: 'rgba(2, 6, 23, 0.62)',
+    buttonsStyling: false,
+    didOpen: (p) => {
+        p.style.borderRadius = '18px';
+        p.style.border = '1px solid var(--border)';
+        p.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        const ok = p.querySelector('.swal2-confirm');
+        if (ok) { ok.style.background = 'linear-gradient(45deg,#38BDF8,#3B82F6)'; ok.style.color = '#fff'; ok.style.border = 'none'; ok.style.borderRadius = '999px'; ok.style.padding = '10px 20px'; ok.style.fontWeight = '600'; }
+        const no = p.querySelector('.swal2-cancel');
+        if (no) { no.style.background = 'var(--surface-2)'; no.style.color = 'var(--text)'; no.style.border = '1px solid var(--border)'; no.style.borderRadius = '999px'; no.style.padding = '10px 20px'; no.style.fontWeight = '600'; }
     }
 });
- 
-const GymToast = Swal.mixin({
-    toast:              true,
-    position:           'top-end',
-    showConfirmButton:  false,
-    timer:              3000,
-    timerProgressBar:   true,
-    customClass: { container: 'swal-on-top' },
-    didOpen: (toast) => {
-        toast.style.background     = 'rgba(9,9,121,0.95)';
-        toast.style.backdropFilter = 'blur(20px)';
-        toast.style.border         = '1px solid rgba(255,255,255,0.2)';
-        toast.style.borderRadius   = '12px';
-        toast.style.color          = '#ffffff';
-        toast.addEventListener('mouseenter', Swal.stopTimer);
-        toast.addEventListener('mouseleave', Swal.resumeTimer);
+
+const GymToast = window.GymToast || Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-toast-popup',
+        title: 'gym-toast-title',
+        htmlContainer: 'gym-toast-text'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    didOpen: (t) => {
+        t.style.borderRadius = '12px';
+        t.style.border = '1px solid var(--border)';
+        t.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        t.addEventListener('mouseenter', Swal.stopTimer);
+        t.addEventListener('mouseleave', Swal.resumeTimer);
     }
 });
+
+window.GymSwal = window.GymSwal || GymSwal;
+window.GymToast = window.GymToast || GymToast;
 
 const themeToggle = document.getElementById('themeToggle');
 const themeLabel = document.getElementById('theme-label');
 const thumb = document.querySelector('.toggle-thumb i');
 // APPLY SAVED THEME ON LOAD
 window.addEventListener('DOMContentLoaded', () => {
+    const savedStateToggle = localStorage.getItem('sidebar-state');
+    const sidebar = document.getElementById("sidebar");
+
+    if (savedStateToggle === 'active') {
+        sidebar.classList.add('active');
+    } else {
+        sidebar.classList.remove('active');
+    }
+
     const savedTheme = localStorage.getItem('theme');
 
     if (savedTheme === 'dark') {
@@ -175,7 +186,8 @@ if(!workoutName){
             workoutDescription: workoutDescription,
         },
 success:function(result){
-if(result === "Success"){
+            const normalized = String(result).trim().toLowerCase();
+            if (normalized === "success") {
                 // Close modal first
                 closeModal();
                 GymToast.fire({
@@ -186,6 +198,12 @@ if(result === "Success"){
                 setTimeout(() => {
                     location.reload();
                 }, 3000);
+            } else {
+                GymSwal.fire({
+                    icon: 'error',
+                    title: 'Add failed',
+                    text: String(result)
+                });
             }
         }
     })
@@ -214,7 +232,7 @@ function SaveEdit(WorkoutID){
             EditworkoutDescription: workoutDescription,
         },
 success:function(result){
-            if(result === "success"){
+            if (String(result).trim().toLowerCase() === "success") {
                 // Close modal first
                 closeModalEdit();
                 GymToast.fire({
@@ -225,6 +243,12 @@ success:function(result){
                 setTimeout(() => {
                     location.reload();
                 }, 1500);
+            } else {
+                GymSwal.fire({
+                    icon: 'error',
+                    title: 'Update failed',
+                    text: String(result)
+                });
             }
         }
     })
@@ -232,7 +256,7 @@ success:function(result){
 }
 $(document).ready(function () {
     $('#workoutTable').DataTable({
-        pageLength: 3,        // 🔥 limit to 3
+        pageLength: 3,        // limit to 3
         lengthChange: false,
         searching: true,
         info: false,
@@ -297,8 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 //logout func
 
-function LogoutFunc() {
-    GymSwal.fire({
+window.LogoutFunc = window.LogoutFunc || function() {
+    (window.GymSwal || Swal).fire({
         title: 'Leaving so soon?',
         icon: 'question',
         showCancelButton: true,
@@ -313,4 +337,4 @@ function LogoutFunc() {
             });
         }
     });
-}
+};

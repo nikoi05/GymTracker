@@ -1,0 +1,505 @@
+﻿/* ── admin-exercises.css ───────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════
+   1. TOOLBAR SELECTS & INPUTS — dark-mode fix
+   ═══════════════════════════════════════════════ */
+
+.toolbar-row input,
+.toolbar-row select {
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--text);           /* follows CSS var — works in both modes */
+    padding: 0 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: var(--transition);
+}
+
+.toolbar-row input:focus,
+.toolbar-row select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* Key fix: tell the browser to render native option lists in dark mode */
+[data-theme="dark"] .toolbar-row select,
+[data-theme="dark"] .ex-filter-select,
+[data-theme="dark"] .browser-default {
+    color-scheme: dark;
+}
+
+/* Fallback for browsers that respect option styling */
+.toolbar-row select option,
+.ex-filter-select option,
+.browser-default option {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+[data-theme="dark"] .toolbar-row select option,
+[data-theme="dark"] .ex-filter-select option,
+[data-theme="dark"] .browser-default option {
+    background: #090979;
+    color: #F1F5F9;
+}
+
+.ex-search-input { min-width: 280px; }
+.ex-filter-select { min-width: 140px; }
+
+/* Custom arrow for .browser-default & .ex-filter-select */
+.browser-default,
+.ex-filter-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg fill='%235B7BAF' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.browser-default:focus,
+.ex-filter-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+
+/* ═══════════════════════════════════════════════
+   2. MODAL REDESIGN
+   ═══════════════════════════════════════════════ */
+
+/* Overlay */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(2, 0, 36, 0.55);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.modal.open { display: flex; }
+
+/* Modal shell */
+#AddExModal .modal-content,
+#EditExModal .modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    max-height: 92vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 24px 64px rgba(2, 0, 36, 0.30);
+    display: flex;
+    flex-direction: column;
+    padding: 0;           /* reset — sections control their own padding */
+}
+
+[data-theme="dark"] #AddExModal .modal-content,
+[data-theme="dark"] #EditExModal .modal-content {
+    background: #0d0d3a;
+    border-color: rgba(255,255,255,0.10);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.65);
+}
+
+/* ── Modal Header ── */
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 24px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-head-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.modal-icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-icon i { font-size: 22px; }
+
+.add-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+}
+.modal-head > div > p,
+.modal-head p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Close button — top-right inside header */
+.modal-close-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    /* override any absolute positioning from parent stylesheet */
+    position: static !important;
+}
+.modal-close-btn i { font-size: 18px; }
+.modal-close-btn:hover {
+    background: rgba(239, 68, 68, 0.10);
+    color: #EF4444;
+    border-color: rgba(239, 68, 68, 0.28);
+}
+
+/* ── Modal Body ── */
+.add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 24px;
+}
+
+/* Two-column grid inside form */
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+@media (max-width: 580px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+/* Input groups */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.input-group label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea,
+.browser-default,
+.step-input {
+    height: 40px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    padding: 0 13px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: var(--transition);
+    width: 100%;
+}
+.input-group textarea {
+    height: auto;
+    padding: 10px 13px;
+    resize: vertical;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus,
+.browser-default:focus,
+.step-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+    background: var(--surface);
+}
+
+/* Dark mode text fix for all modal inputs */
+[data-theme="dark"] #AddExModal input,
+[data-theme="dark"] #AddExModal select,
+[data-theme="dark"] #AddExModal textarea,
+[data-theme="dark"] #EditExModal input,
+[data-theme="dark"] #EditExModal select,
+[data-theme="dark"] #EditExModal textarea,
+[data-theme="dark"] .step-input {
+    color: #F1F5F9 !important;
+    background: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.12) !important;
+}
+
+[data-theme="dark"] #AddExModal select,
+[data-theme="dark"] #EditExModal select,
+[data-theme="dark"] .modal .browser-default {
+    color-scheme: dark;
+}
+
+[data-theme="dark"] #AddExModal select option,
+[data-theme="dark"] #EditExModal select option {
+    background: #090979;
+    color: #F1F5F9;
+}
+
+[data-theme="dark"] .input-group label {
+    color: rgba(255, 255, 255, 0.50) !important;
+}
+
+/* Section dividers (Steps / Tags headings) */
+.form-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+}
+.form-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── Steps builder ── */
+.steps-list  { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.step-row    { display: flex; gap: 8px; align-items: center; }
+.step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #38BDF8, #3B82F6);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.step-input { flex: 1; height: 38px; }
+
+.step-del {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+.step-del:hover { background: rgba(239,68,68,0.10); color: #EF4444; border-color: rgba(239,68,68,0.30); }
+.step-del i { font-size: 15px; }
+
+.add-step-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 4px;
+}
+.add-step-btn:hover {
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+}
+.add-step-btn i { font-size: 15px; }
+
+/* ── Tags ── */
+.tag-input-row { display: flex; gap: 8px; }
+.tag-input-row input { flex: 1; }
+
+.tag-add-btn {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 9px;
+    border: 1px solid var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.tag-add-btn:hover { background: var(--accent); color: #fff; }
+
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; margin-top: 6px; }
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: var(--accent-light);
+    border: 1px solid rgba(59,130,246,0.20);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+}
+.tag-chip button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+.tag-chip button:hover { color: #EF4444; }
+
+/* ── Modal Footer ── */
+.modal-footer-btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    border-radius: 0 0 20px 20px;
+}
+
+[data-theme="dark"] .modal-footer-btns {
+    background: rgba(255,255,255,0.03);
+}
+
+.cancel-btn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.cancel-btn:hover { background: var(--surface-2); color: var(--text); }
+
+.register-button {
+    height: 40px;
+    padding: 0 22px;
+    border-radius: 9px;
+    border: none;
+    background: linear-gradient(45deg, #38BDF8, #3B82F6);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(59,130,246,0.30);
+}
+.register-button:hover {
+    opacity: 0.88;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.40);
+    transform: translateY(-1px);
+}
+.save-icon { font-size: 16px; }
+
+
+/* ═══════════════════════════════════════════════
+   3. TABLE HELPERS
+   ═══════════════════════════════════════════════ */
+
+.action-btns        { display: flex; gap: 6px; white-space: nowrap; }
+.col-id-muted       { color: var(--text-muted); font-size: 12px; }
+.col-muted          { font-size: 13px; color: var(--text-muted); }
+.col-date-muted     { font-size: 12px; color: var(--text-muted); }
+.add-icon           { font-size: 18px; }
+.ex-table           { width: 100%; }
+
+.entity-cell { display: flex; align-items: center; gap: 10px; }
+.entity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.entity-icon img { width: 22px; height: 22px; object-fit: contain; }
+.entity-icon i   { font-size: 20px; }
+.entity-name     { font-weight: 700; font-size: 13px; color: var(--text); }
+.entity-sub      { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.exercise-desc-textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: vertical;
+    transition: var(--transition);
+}
+.exercise-desc-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* Difficulty / type badge tints */
+.diff-beginner     { background: rgba(34,197,94,0.12);  color: #16A34A; }
+.diff-intermediate { background: rgba(245,158,11,0.12); color: #D97706; }
+.diff-advanced     { background: rgba(239,68,68,0.12);  color: #DC2626; }
+.type-strength     { background: rgba(56,189,248,0.12); color: #0EA5E9; }
+.type-cardio       { background: rgba(245,158,11,0.12); color: #F59E0B; }
+.type-bodyweight   { background: rgba(34,197,94,0.12);  color: #22C55E; }
+.type-flexibility  { background: rgba(168,85,247,0.12); color: #A855F7; }

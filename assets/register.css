@@ -262,6 +262,71 @@ select {
     color: rgba(255,255,255,0.8);
 }
 
+
+/* Register validation feedback */
+.required-mark {
+    color: #FCA5A5;
+    font-weight: 800;
+}
+
+.password-rules {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    display: grid;
+    gap: 6px;
+}
+
+.password-rules li,
+.field-hint {
+    color: rgba(255,255,255,0.72);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.password-rules li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.password-rules li::before {
+    content: "radio_button_unchecked";
+    font-family: "Material Icons";
+    font-size: 14px;
+    line-height: 1;
+}
+
+.password-rules li.valid,
+.field-hint.valid {
+    color: #86EFAC;
+}
+
+.password-rules li.valid::before {
+    content: "check_circle";
+}
+
+.password-rules li.invalid,
+.field-hint.invalid {
+    color: #FCA5A5;
+}
+
+.password-rules li.invalid::before {
+    content: "cancel";
+}
+
+.field-hint {
+    display: block;
+    margin-top: 7px;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.18);
+}
 /* BUTTON */
 .register-button {
     width: 100%;
@@ -280,76 +345,9 @@ select {
     box-shadow: 0 10px 25px rgba(56,189,248,0.5);
 }
 
-
-/* FOOTER */
-.register-footer {
-    margin-top: 20px;
-    text-align: center;
-    color: rgba(255,255,255,0.85);
-}
-
-.register-footer a {
-    color: #38BDF8;
-    text-decoration: none;
-}
-
-/* Floating Cards for Register Page */
-.register-main {
-    position: relative;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 120px 20px 60px;
-}
-    /* FOOTER */
-footer {
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 30px 20px;
-    text-align: center;
-    margin-top: auto;
-}
-
-.footer-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.footer-brand {
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.footer-links {
-    display: flex;
-    gap: 24px;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: #38BDF8;
-}
-
-.footer-copyright {
-    margin-top: 20px;
-    opacity: 0.7;
-    font-size: 14px;
-}
-
 /* Responsive */
 @media(max-width:768px){
+
     .floating-card {
         display:none; /* Hide floating cards on small screens */
     }
@@ -369,3 +367,22 @@ footer {
         transform: scale(0.8) rotate(var(--angle,0deg));
     }
 }
+
+@media (max-width: 640px) {
+    footer {
+        padding: 24px 16px 22px;
+    }
+
+    .footer-brand {
+        width: 100%;
+        max-width: 260px;
+    }
+}
+
+/* Footer matches dark gradient background */
+footer {
+    background: rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(255,255,255,0.12);
+}
+footer .footer-brand { color: #e2e8f0; }
+footer .footer-copyright { color: rgba(255,255,255,0.55); }

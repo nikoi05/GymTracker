@@ -1,5 +1,5 @@
 <?php 
-    require_once __DIR__ . "../../BL/userManager.php";
+    require_once __DIR__ . "/../BL/userManager.php";
     $userM = new managerUser();
     
 

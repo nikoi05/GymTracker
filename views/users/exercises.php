@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../BL/exerciseManage.php';
 require_once __DIR__ . '/../../BL/WorkoutManager.php';
 $em = new ExerciseManage();
 $wm = new WorkoutManager();
-$homefriendly = $em->readtotalHomeexercises();
+$stats = $em->getUserStats();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,13 +15,14 @@ $homefriendly = $em->readtotalHomeexercises();
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Document</title>
+    <title>GymTracker - Exercises</title>
+    <link rel="stylesheet" href="/workout_trackersys/assets/user-enhancements.css">    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
 <body>
     <div class="Sidebar" id="sidebar">
         <div class="NavLinks">
-            <button class="toggle-btn" onclick="ToggleSidebar()">☰</button>
-            <span class="text">GymTracker</span>
+            <button class="toggle-btn" onclick="ToggleSidebar()"><i class="material-icons">menu</i></button>
+        <div class="sidebar-brand"><span class="sidebar-logo" aria-hidden="true">&#128170;</span><span class="text"><span class="brand-gym">Gym</span>Tracker</span></div>
             <ul>
                 <li onclick="redirectUser(1)">
                     <i class="material-icons icon">dashboard</i>
@@ -60,7 +61,15 @@ $homefriendly = $em->readtotalHomeexercises();
             </ul>
         </div>
 
-        <div class="Logout">
+            <div class="sidebar-theme">
+        <span class="toggle-label" id="theme-label">Light</span>
+        <label class="toggle">
+            <input type="checkbox" id="themeToggle">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"><i class="material-icons">brightness_5</i></div>
+        </label>
+    </div>
+<div class="Logout">
             <button type="button" onclick="LogoutFunc()">
                 <i class="material-icons">logout</i>
                 <span class="text">Logout</span>
@@ -72,20 +81,14 @@ $homefriendly = $em->readtotalHomeexercises();
     <!-- MAIN -->
     <div class="main-content">
         <!-- TOP BAR -->
-        <div class="top-bar">
-            <div class="title-header">
-                <h2>Exercise Library</h2>
-                <h5>Search, filter, and learn proper form for every exercise</h5>
+        <section class="page-hero">
+            <div>
+                <span class="section-kicker">Exercise Library</span>
+                <h2>Exercises</h2>
+                <p>Search, filter, and learn proper form for every exercise.</p>
             </div>
-            <div class="toggle-wrap">
-                <span class="toggle-label" id="theme-label">Light</span>
-                <label class="toggle">
-                    <input type="checkbox" id="themeToggle">
-                    <div class="toggle-track"></div>
-                    <div class="toggle-thumb"><i class="material-icons light-icon">brightness_5</i></div>
-                </label>
-            </div>
-        </div>
+            <div class="hero-icon"><i class="material-icons">directions_run</i></div>
+        </section>
 
         <!-- SEARCH & FILTERS -->
         <div class="search-filter-bar">
@@ -95,44 +98,44 @@ $homefriendly = $em->readtotalHomeexercises();
             </div>
             <div class="filter-pills">
                 <button class="pill active" onclick="setFilter('all', this)">All</button>
-                <button class="pill" onclick="setFilter('chest', this)">💪 Chest</button>
-                <button class="pill" onclick="setFilter('back', this)">🔙 Back</button>
-                <button class="pill" onclick="setFilter('shoulders', this)">🏋️ Shoulders</button>
-                <button class="pill" onclick="setFilter('legs', this)">🦵 Legs</button>
-                <button class="pill" onclick="setFilter('arms', this)">💪 Arms</button>
-                <button class="pill" onclick="setFilter('core', this)">🔥 Core</button>
-                <button class="pill" onclick="setFilter('cardio', this)">🏃 Cardio</button>
-                <button class="pill" onclick="setFilter('full-body', this)">⚡ Full Body</button>
+                <button class="pill" onclick="setFilter('chest', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">fitness_center</i> Chest</button>
+                <button class="pill" onclick="setFilter('back', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">accessibility_new</i> Back</button>
+                <button class="pill" onclick="setFilter('shoulders', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">sports_gymnastics</i> Shoulders</button>
+                <button class="pill" onclick="setFilter('legs', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">directions_walk</i> Legs</button>
+                <button class="pill" onclick="setFilter('arms', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">sports_handball</i> Arms</button>
+                <button class="pill" onclick="setFilter('core', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">local_fire_department</i> Core</button>
+                <button class="pill" onclick="setFilter('cardio', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">directions_run</i> Cardio</button>
+                <button class="pill" onclick="setFilter('full-body', this)"><i class="material-icons" style="font-size:14px;vertical-align:middle">bolt</i> Full Body</button>
             </div>
         </div>
 
         <!-- STATS STRIP -->
         <div class="stats-strip">
             <div class="strip-card">
-                <div class="strip-icon">📚</div>
+                <div class="strip-icon"><i class="material-icons">menu_book</i></div>
                 <div class="strip-info">
-                    <div class="strip-val" id="totalCount">24</div>
+                    <div class="strip-val" id="totalCount"><?= $stats['total'] ?></div>
                     <div class="strip-label">Total Exercises</div>
                 </div>
             </div>
             <div class="strip-card">
-                <div class="strip-icon">💪</div>
+                <div class="strip-icon"><i class="material-icons">fitness_center</i></div>
                 <div class="strip-info">
-                    <div class="strip-val">8</div>
+                    <div class="strip-val"><?= $stats['muscles'] ?></div>
                     <div class="strip-label">Muscle Groups</div>
                 </div>
             </div>
             <div class="strip-card">
-                <div class="strip-icon">🏠</div>
+                <div class="strip-icon"><i class="material-icons">home</i></div>
                 <div class="strip-info">
-                    <div class="strip-val"><?= $homefriendly['total'] ?></div>
+                    <div class="strip-val"><?= $stats['home'] ?></div>
                     <div class="strip-label">Home Friendly</div>
                 </div>
             </div>
             <div class="strip-card">
                 <div class="strip-icon">⭐</div>
                 <div class="strip-info">
-                    <div class="strip-val">6</div>
+                    <div class="strip-val"><?= $stats['beginner'] ?></div>
                     <div class="strip-label">Beginner Picks</div>
                 </div>
             </div>
@@ -258,6 +261,12 @@ $homefriendly = $em->readtotalHomeexercises();
 
     <script src="/workout_trackersys/scripts/redirect.js"></script>
     <script src="/workout_trackersys/scripts/exerciseServices.js"></script>
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span>Tracker</div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
 </body>
 </html>
 

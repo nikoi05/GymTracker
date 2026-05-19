@@ -8,6 +8,7 @@
     max-width: 640px !important;
     max-height: 92vh;
     overflow-y: auto;
+    z-index: 99;
 }
 
 /* ── Search icon position fix (was right:14px, should be left) ── */

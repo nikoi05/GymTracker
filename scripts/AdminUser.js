@@ -1,6 +1,8 @@
 
+let usersTableDT;
+
 document.addEventListener("DOMContentLoaded", function () {
-    new DataTable('#usersTable', {
+    usersTableDT = new DataTable('#usersTable', {
         pageLength: 5,
         paging: true,
         searching: true,
@@ -10,11 +12,39 @@ document.addEventListener("DOMContentLoaded", function () {
                 previous: '<i class="material-icons" style="font-size:18px; vertical-align:middle;">chevron_left</i>',
                 next: '<i class="material-icons" style="font-size:18px; vertical-align:middle;">chevron_right</i>'
             }
-        }
+        },
+        // keep DataTables internal search enabled; we just add extra controls below
     });
+
+    // Quick search input -> DataTables global search
+    const quickSearch = document.getElementById('quickSearch');
+    if (quickSearch) {
+        quickSearch.addEventListener('input', () => {
+            if (!usersTableDT) return;
+            usersTableDT.search(quickSearch.value.trim()).draw();
+        });
+    }
+
+    // Role filter -> DataTables column search (Role column index = 5)
+    const roleFilter = document.getElementById('roleFilter');
+    if (roleFilter) {
+        roleFilter.addEventListener('change', () => {
+            if (!usersTableDT) return;
+            const selected = roleFilter.value;
+
+            // Map roleID -> role_description text by reading option text
+            const selectedText = selected ? roleFilter.options[roleFilter.selectedIndex].text.trim() : '';
+            usersTableDT.column(5).search(selectedText).draw();
+        });
+    }
 });
+    
     function ToggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("active");
+     const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("active");
+  // Save the state based on the current class list
+  const isActive = sidebar.classList.contains('active');
+  localStorage.setItem('sidebar-state', isActive ? 'active' : 'inactive');
   }
 const themeToggle = document.getElementById('themeToggle');
 const themeLabel = document.getElementById('theme-label');
@@ -22,8 +52,19 @@ const thumb = document.querySelector('.toggle-thumb i');
 
 // APPLY SAVED THEME ON LOAD
 window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
+const savedStateToggle = localStorage.getItem('sidebar-state');
+  const sidebar = document.getElementById("sidebar");
 
+  // Only add the class if it was saved as 'active'
+  if (savedStateToggle === 'active') {
+      sidebar.classList.add('active');
+  } else {
+      sidebar.classList.remove('active');
+  }
+
+
+    // theme 
+    const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         themeToggle.checked = true;
@@ -51,8 +92,8 @@ themeToggle.addEventListener('change', () => {
         localStorage.setItem('theme', 'light');
     }
 });
-function LogoutFunc() {
-    GymSwal.fire({
+window.LogoutFunc = window.LogoutFunc || function() {
+    (window.GymSwal || Swal).fire({
         title: 'Leaving so soon?',
         icon: 'question',
         showCancelButton: true,
@@ -67,30 +108,7 @@ function LogoutFunc() {
             });
         }
     });
-}
-
-/* ============================================================
-   GYMSWAL & GYMTOAST
-============================================================ */
-const GymSwal = Swal.mixin({
-    customClass:{ container:'swal-on-top' }, backdrop:'rgba(0,0,0,0.5)',
-    didOpen:(p)=>{
-        p.style.background='rgba(9,9,121,0.95)'; p.style.backdropFilter='blur(20px)';
-        p.style.border='1px solid rgba(255,255,255,0.2)'; p.style.borderRadius='20px';
-        p.style.color='#fff'; p.style.fontFamily='Poppins,sans-serif';
-        const t=p.querySelector('.swal2-title'); if(t)t.style.color='#fff';
-        const tx=p.querySelector('.swal2-html-container'); if(tx)tx.style.color='rgba(255,255,255,0.8)';
-        const c=p.querySelector('.swal2-confirm'); if(c){c.style.background='linear-gradient(45deg,#38BDF8,#3B82F6)';c.style.border='none';c.style.borderRadius='50px';c.style.fontFamily='Poppins,sans-serif';c.style.fontWeight='600';}
-        const x=p.querySelector('.swal2-cancel'); if(x){x.style.background='rgba(255,255,255,0.15)';x.style.color='white';x.style.border='1px solid rgba(255,255,255,0.2)';x.style.borderRadius='50px';x.style.fontFamily='Poppins,sans-serif';x.style.fontWeight='600';}
-    }
-});
-
-const GymToast = Swal.mixin({
-    toast:true, position:'top-end', showConfirmButton:false, timer:3000, timerProgressBar:true,
-    customClass:{ container:'swal-on-top' },
-    didOpen:(t)=>{ t.style.background='rgba(9,9,121,0.95)'; t.style.backdropFilter='blur(20px)'; t.style.border='1px solid rgba(255,255,255,0.2)'; t.style.borderRadius='12px'; t.style.color='#fff'; t.addEventListener('mouseenter',Swal.stopTimer); t.addEventListener('mouseleave',Swal.resumeTimer); }
-});
-
+};
 const modal = document.getElementById("AddModal");
 
 // open modal
@@ -112,59 +130,124 @@ window.onclick = function(e) {
 
 
 function addUserFunc() {
-    const username = document.getElementById("username").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const password_confirm = document.getElementById("confirm_password").value.trim();
-    const doBirth = document.getElementById("doBirth").value.trim();
+    const usernameEl = document.getElementById("username");
+    const emailEl = document.getElementById("email");
+    const passwordEl = document.getElementById("password");
+    const passwordConfirmEl = document.getElementById("confirm_password");
+    const doBirthEl = document.getElementById("doBirth");
+    const genderSelectEl = document.getElementById("gender");
+    const otherGenderEl = document.getElementById("othergender");
 
-    let errors = [];
+    const username = usernameEl?.value.trim() || "";
+    const email = emailEl?.value.trim() || "";
+    const password = passwordEl?.value || "";
+    const password_confirm = passwordConfirmEl?.value || "";
+    const doBirth = doBirthEl?.value.trim() || "";
+
+    // Prefer othergender if it has a value, otherwise use the select value
+    let gender = (otherGenderEl?.value || "").trim();
+    if (!gender) gender = (genderSelectEl?.value || "");
+
+    const errors = [];
+
+    const setErr = (el, msg) => {
+        if (!el) return;
+        el.style.border = '1px solid rgba(239,68,68,0.9)';
+        el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        if (msg) errors.push(msg);
+    };
+    const clearErr = (el) => {
+        if (!el) return;
+        el.style.border = '';
+        el.style.boxShadow = '';
+    };
 
     // Username
+    const uOk = /^[A-Za-z0-9._-]+$/.test(username) && username.length >= 3 && username.length <= 50;
     if (!username) {
         errors.push("Username is required.");
-        setErrorBorder(document.getElementById("username"));
-    } else clearErrorBorder(document.getElementById("username"));
+        setErr(usernameEl);
+    } else if (!uOk) {
+        errors.push("Username must be 3-50 chars and contain only letters, numbers, dot, underscore, dash.");
+        setErr(usernameEl);
+    } else {
+        clearErr(usernameEl);
+    }
 
     // Email
     if (!email) {
         errors.push("Email is required.");
-        setErrorBorder(document.getElementById("email"));
-    } else clearErrorBorder(document.getElementById("email"));
+        setErr(emailEl);
+    } else if (!validateEmail(email)) {
+        errors.push("Invalid email format.");
+        setErr(emailEl);
+    } else {
+        clearErr(emailEl);
+    }
 
     // Password
     if (!password) {
         errors.push("Password is required.");
-        setErrorBorder(document.getElementById("password"));
-    } else clearErrorBorder(document.getElementById("password"));
-
-    // Confirm Password
-    if (!password_confirm) {
-        errors.push("Confirm Password is required.");
-        setErrorBorder(document.getElementById("confirm_password"));
-    } else clearErrorBorder(document.getElementById("confirm_password"));
-
-    // Date of Birth
-    if (!doBirth) {
-        errors.push("Date of Birth is required.");
-        setErrorBorder(document.getElementById("doBirth"));
-    } else clearErrorBorder(document.getElementById("doBirth"));
-
-    // Gender
-    const gender = getotherGender() !== "" ? getotherGender() : document.getElementById("gender").value;
-
-    // Password match verification
-    verifypassFUNC(errors);
-
-    // Email format validation
-    if (email && !validateEmail(email)) {
-        errors.push("Invalid email format.");
-        setErrorBorder(document.getElementById("email"));
+        setErr(passwordEl);
+    } else {
+        clearErr(passwordEl);
+        if (password.length < 8) {
+            errors.push("Password must be at least 8 characters.");
+            setErr(passwordEl);
+        }
     }
 
-    // Show errors if any
-    if (errors.length > 0) {
-        Swal.fire({
+    // Confirm password
+    if (!password_confirm) {
+        errors.push("Confirm Password is required.");
+        setErr(passwordConfirmEl);
+    } else {
+        clearErr(passwordConfirmEl);
+    }
+
+    if (password && password_confirm && password !== password_confirm) {
+        errors.push("Passwords do not match.");
+        setErr(passwordEl);
+        setErr(passwordConfirmEl);
+    }
+
+    // DOB
+    if (!doBirth) {
+        errors.push("Date of Birth is required.");
+        setErr(doBirthEl);
+    } else {
+        const date = new Date(doBirth + 'T00:00:00');
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const hundredYearsAgo = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+
+        if (Number.isNaN(date.getTime())) {
+            errors.push("Invalid Date of Birth.");
+            setErr(doBirthEl);
+        } else if (date > today) {
+            errors.push("Date of Birth cannot be in the future.");
+            setErr(doBirthEl);
+        } else if (date < hundredYearsAgo) {
+            errors.push("Date of Birth looks too far in the past.");
+            setErr(doBirthEl);
+        } else {
+            clearErr(doBirthEl);
+        }
+    }
+
+    // Gender
+    if (!gender) {
+        errors.push("Gender is required.");
+        setErr(genderSelectEl);
+    } else if (!Number.isInteger(Number(gender))) {
+        errors.push("Invalid gender selection.");
+        setErr(genderSelectEl);
+    } else {
+        clearErr(genderSelectEl);
+    }
+
+    if (errors.length) {
+        GymSwal.fire({
             icon: 'error',
             title: 'Please check the following:',
             html: errors.join("<br>")
@@ -172,32 +255,25 @@ function addUserFunc() {
         return;
     }
 
-    // AJAX registration
     $.ajax({
         url: "/workout_trackersys/controllers/UserController.php",
         type: "POST",
         data: { username, email, password, dateofBirth: doBirth, gender },
         success: function(returnedData) {
-            const data = returnedData.trim();
+            const data = String(returnedData).trim();
             if (data.includes("Email already exists") || data.includes("Username already exists")) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    text: data
-                });
+                GymSwal.fire({ icon: 'warning', title: 'Oops...', text: data });
             } else {
-                Swal.fire({
+                (window.GymSwal || Swal).fire({
                     icon: 'success',
                     title: 'User Added',
                     confirmButtonText:"Okay",
                     showConfirmButton:true
-                }).then((result) =>{
-                   location.reload();
-                });
+                }).then(() => location.reload());
             }
         },
         error: function(xhr) {
-            Swal.fire({
+            GymSwal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: xhr.status + ": " + xhr.responseText
@@ -207,17 +283,20 @@ function addUserFunc() {
 }
 
 
+
 // Open Edit Modal
 function openEditModal(userData) {
     const editModal = document.getElementById('EditModal');
     window.currentUserData =userData;
+    console.log(userData);
     
     // Fill the fields
     document.getElementById('edit_userID').value = userData.userID;
     document.getElementById('edit_username').value = userData.username;
     document.getElementById('edit_email').value = userData.email;
-    document.getElementById('edit_gender').value = userData.gender;
+    document.getElementById('edit_gender').value = userData.genderID;
     document.getElementById('edit_doBirth').value = userData.day_of_birth;
+    document.getElementById('edit_role').value = userData.profileLevel;
 
     // Show it
     editModal.classList.add('active');
@@ -234,53 +313,157 @@ window.addEventListener('click', function(e) {
         e.target.classList.remove('active');
     }
 });
-function updateUserFunc(){
-    const originalData =window.currentUserData;
-    // 1. Get the values
-    let userID   = document.getElementById('edit_userID').value;
-    let username = document.getElementById('edit_username').value.trim();
-    let email    = document.getElementById('edit_email').value.trim();
-    let password =document.getElementById('edit_password').value.trim();
-    let doBirth  = document.getElementById('edit_doBirth').value.trim();
-    let gender   = document.getElementById('edit_gender').value;
-    let role     = document.getElementById('edit_role').value;
+function unhidepassFunc(button){
+    const targetId = button.getAttribute('data-target');
+    const targetInput = document.getElementById(targetId);
 
-    // check if empty field then it will use the original data
+    if(!targetInput) return;
+
+    if(targetInput.type === "password"){
+        targetInput.type = "text";
+        button.textContent = "visibility_off";
+    }else{
+        targetInput.type = "password";
+        button.textContent = "visibility";
+    }
+}
+
+
+function updateUserFunc(){
+    const originalData = window.currentUserData;
+
+    const userIDEl = document.getElementById('edit_userID');
+    const usernameEl = document.getElementById('edit_username');
+    const emailEl = document.getElementById('edit_email');
+    const passwordEl = document.getElementById('edit_password');
+    const doBirthEl = document.getElementById('edit_doBirth');
+    const genderEl = document.getElementById('edit_gender');
+    const roleEl = document.getElementById('edit_role');
+
+    const userID = userIDEl?.value;
+
+    let username = (usernameEl?.value || '').trim();
+    let email = (emailEl?.value || '').trim();
+    let password = (passwordEl?.value || '').trim();
+    let doBirth = (doBirthEl?.value || '').trim();
+    let gender = (genderEl?.value || '');
+    let role = (roleEl?.value || '');
+
+    // If optional fields empty, use original
     username = username || originalData.username;
-    email    = email    || originalData.email;
-    doBirth  = doBirth  || originalData.day_of_birth;
-    gender   = gender   || originalData.gender;
-    role     = role     || originalData.role;
-    // 2. Validation
-    if(email!==originalData.email && !validateEmail(email)){
-         Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+    email = email || originalData.email;
+    doBirth = doBirth || originalData.day_of_birth;
+    gender = gender || originalData.gender;
+    role = role || originalData.profileLevel;
+
+    const errors = [];
+
+    const setErr = (el, msg) => {
+        if (!el) return;
+        el.style.border = '1px solid rgba(239,68,68,0.9)';
+        el.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        if (msg) errors.push(msg);
+    };
+    const clearErr = (el) => {
+        if (!el) return;
+        el.style.border = '';
+        el.style.boxShadow = '';
+    };
+
+    // Username
+    const uOk = /^[A-Za-z0-9._-]+$/.test(username) && username.length >= 3 && username.length <= 50;
+    if (!uOk) {
+        setErr(usernameEl, 'Username must be 3-50 chars and contain only letters, numbers, dot, underscore, dash.');
+    } else {
+        clearErr(usernameEl);
+    }
+
+    // Email
+    if (!email) {
+        setErr(emailEl, 'Email is required.');
+    } else if (!validateEmail(email)) {
+        setErr(emailEl, 'Invalid email format.');
+    } else {
+        clearErr(emailEl);
+    }
+
+    // DOB
+    if (!doBirth) {
+        setErr(doBirthEl, 'Date of Birth is required.');
+    } else {
+        const date = new Date(doBirth + 'T00:00:00');
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const hundredYearsAgo = new Date(now.getFullYear() - 100, now.getMonth(), now.getDate());
+
+        if (Number.isNaN(date.getTime())) {
+            setErr(doBirthEl, 'Invalid Date of Birth.');
+        } else if (date > today) {
+            setErr(doBirthEl, 'Date of Birth cannot be in the future.');
+        } else if (date < hundredYearsAgo) {
+            setErr(doBirthEl, 'Date of Birth looks too far in the past.');
+        } else {
+            clearErr(doBirthEl);
+        }
+    }
+
+    // Gender
+    if (!gender || !Number.isInteger(Number(gender))) {
+        setErr(genderEl, 'Invalid gender selection.');
+    } else {
+        clearErr(genderEl);
+    }
+
+    // Role
+    if (role === null || role === undefined || String(role).trim() === '' || !Number.isInteger(Number(role))) {
+        setErr(roleEl, 'Role is required.');
+    } else {
+        clearErr(roleEl);
+    }
+
+    // Password (optional)
+    if (password) {
+        if (password.length < 8) {
+            setErr(passwordEl, 'Password must be at least 8 characters.');
+        } else {
+            clearErr(passwordEl);
+        }
+    } else {
+        clearErr(passwordEl);
+    }
+
+    if (errors.length) {
+        GymSwal.fire({
+            icon: 'error',
+            title: 'Please check the following:',
+            html: errors.join('<br>')
+        });
         return;
     }
+
     $.ajax({
         url: "/workout_trackersys/controllers/UserController.php",
         type: "POST",
-        data: { 
+        data: {
             action: "update",
-            UpdateuserID: userID,       
-            Updateusername: username, 
-            Updateemail: email, 
-            Updatepassword:password,
-            UpdatedateofBirth: doBirth,  
+            UpdateuserID: userID,
+            Updateusername: username,
+            Updateemail: email,
+            Updatepassword: password,
+            UpdatedateofBirth: doBirth,
             Updategender: gender,
-            Updaterole:role
+            Updaterole: role
         },
         success: function(returnedData) {
-            const data = returnedData.trim();
+            const data = String(returnedData).trim();
             if (data === "Success") {
-                Swal.fire({
+                GymSwal.fire({
                     icon: 'success',
                     title: 'User Updated',
                     confirmButtonText: "Okay"
-                }).then(() => {
-                    location.reload(); 
-                });
+                }).then(() => location.reload());
             } else {
-                Swal.fire({
+                GymSwal.fire({
                     icon: 'warning',
                     title: 'Oops...',
                     text: data
@@ -288,7 +471,7 @@ function updateUserFunc(){
             }
         },
         error: function(xhr) {
-            Swal.fire({
+            GymSwal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: xhr.status + ": " + xhr.responseText
@@ -296,23 +479,130 @@ function updateUserFunc(){
         }
     });
 }
+
 // Email format validation
 function validateEmail(email) {
     const emailregex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailregex.test(email);
 }
 
-// Live email validation
-document.getElementById("email").addEventListener("input", function() {
-    if (!validateEmail(this.value.trim())) {
-        setErrorBorder(this);
-    } else clearErrorBorder(this);
-});
+// ── Live password rules helper ──
+const passRuleChecks = {
+    len:     p => p.length >= 8,
+    max:     p => p.length <= 100,
+    upper:   p => /[A-Z]/.test(p),
+    num:     p => /\d/.test(p),
+    special: p => /[^A-Za-z0-9]/.test(p)
+};
 
+function updatePassRules(prefix, val) {
+    Object.entries(passRuleChecks).forEach(([key, fn]) => {
+        const el = document.getElementById(`${prefix}-rule-${key}`);
+        if (el) el.style.color = fn(val) ? 'var(--accent,#38BDF8)' : 'var(--text-muted)';
+    });
+}
+
+// Add modal — password rules + match hint
+const addPassEl = document.getElementById('password');
+const addConfEl = document.getElementById('confirm_password');
+const addMatchHint = document.getElementById('add-matchHint');
+
+if (addPassEl) {
+    addPassEl.addEventListener('input', function () {
+        updatePassRules('add', this.value);
+        updateAddMatch();
+    });
+}
+if (addConfEl) {
+    addConfEl.addEventListener('input', updateAddMatch);
+}
+function updateAddMatch() {
+    if (!addMatchHint || !addPassEl || !addConfEl) return;
+    const cp = addConfEl.value;
+    if (!cp) { addMatchHint.textContent = ''; return; }
+    if (addPassEl.value === cp) {
+        addMatchHint.textContent = '✓ Passwords match';
+        addMatchHint.style.color = 'var(--accent,#38BDF8)';
+    } else {
+        addMatchHint.textContent = '✗ Passwords do not match';
+        addMatchHint.style.color = '#ef4444';
+    }
+}
+
+// Add modal — DOB live hint
+const addDobEl = document.getElementById('doBirth');
+const addDobHint = document.getElementById('add-dobHint');
+if (addDobEl) {
+    addDobEl.addEventListener('input', function () {
+        if (!addDobHint) return;
+        const d = new Date(this.value + 'T00:00:00');
+        const today = new Date(); today.setHours(0,0,0,0);
+        const age = today.getFullYear() - d.getFullYear() - (today < new Date(today.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+        if (!this.value) { addDobHint.textContent = 'Must be 18+ years old.'; addDobHint.style.color = 'var(--text-muted)'; return; }
+        if (d > today) { addDobHint.textContent = '✗ Date cannot be in the future.'; addDobHint.style.color = '#ef4444'; return; }
+        if (age < 18) { addDobHint.textContent = `✗ Must be at least 18 (currently ${age}).`; addDobHint.style.color = '#ef4444'; return; }
+        addDobHint.textContent = `✓ Age: ${age}`; addDobHint.style.color = 'var(--accent,#38BDF8)';
+    });
+}
+
+// Edit modal — password rules (show list only when typing)
+const editPassEl = document.getElementById('edit_password');
+const editRulesList = document.getElementById('edit-passRules');
+if (editPassEl) {
+    editPassEl.addEventListener('input', function () {
+        if (editRulesList) editRulesList.style.display = this.value ? 'block' : 'none';
+        updatePassRules('edit', this.value);
+    });
+}
+
+// Edit modal — DOB live hint
+const editDobEl = document.getElementById('edit_doBirth');
+const editDobHint = document.getElementById('edit-dobHint');
+if (editDobEl) {
+    editDobEl.addEventListener('input', function () {
+        if (!editDobHint) return;
+        const d = new Date(this.value + 'T00:00:00');
+        const today = new Date(); today.setHours(0,0,0,0);
+        const age = today.getFullYear() - d.getFullYear() - (today < new Date(today.getFullYear(), d.getMonth(), d.getDate()) ? 1 : 0);
+        if (!this.value) { editDobHint.textContent = 'Must be 18+ years old.'; editDobHint.style.color = 'var(--text-muted)'; return; }
+        if (d > today) { editDobHint.textContent = '✗ Date cannot be in the future.'; editDobHint.style.color = '#ef4444'; return; }
+        if (age < 18) { editDobHint.textContent = `✗ Must be at least 18 (currently ${age}).`; editDobHint.style.color = '#ef4444'; return; }
+        editDobHint.textContent = `✓ Age: ${age}`; editDobHint.style.color = 'var(--accent,#38BDF8)';
+    });
+}
+
+// Live email validation (AddModal)
+const emailInput = document.getElementById("email");
+if (emailInput) {
+    emailInput.addEventListener("input", function() {
+        if (!validateEmail(this.value.trim())) {
+            this.style.border = '1px solid rgba(239,68,68,0.9)';
+            this.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        } else {
+            this.style.border = '';
+            this.style.boxShadow = '';
+        }
+    });
+}
+
+// Live email validation (EditModal)
+const editEmailInput = document.getElementById("edit_email");
+if (editEmailInput) {
+    editEmailInput.addEventListener("input", function() {
+        if (!validateEmail(this.value.trim())) {
+            this.style.border = '1px solid rgba(239,68,68,0.9)';
+            this.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.15)';
+        } else {
+            this.style.border = '';
+            this.style.boxShadow = '';
+        }
+    });
+}
 
 /////////DELETE USER FUNCTION/////////
+
 function deleteUser(userID){
-    Swal.fire({
+    GymSwal.fire({
         title: 'Are you sure?, any actions are irreversible',
         icon: 'warning',
         showCancelButton: true,
@@ -327,7 +617,7 @@ function deleteUser(userID){
                 success: function(returnedData) {
                     const data = returnedData.trim();
                     if (data === "Success") {
-                        Swal.fire({
+                       GymSwal.fire({
                             icon: 'success',
                             title: 'User Deleted',
                             confirmButtonText: "Okay"
@@ -335,7 +625,7 @@ function deleteUser(userID){
                             location.reload();
                         });
                     } else {
-                        Swal.fire({
+                        GymSwal.fire({
                             icon: 'warning',
                             title: 'Oops...',
                             text: data
@@ -343,7 +633,7 @@ function deleteUser(userID){
                     }
                 },
                 error: function(xhr) {
-                    Swal.fire({
+                    GymSwal.fire({
                         icon: 'error',
                         title: 'Error',
                         text: xhr.status + ": " + xhr.responseText
@@ -353,3 +643,56 @@ function deleteUser(userID){
         }
     });
 }
+
+/* ============================================================
+   GYMSWAL & GYMTOAST
+============================================================ */
+const GymSwal = window.GymSwal || Swal.mixin({
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-swal-popup',
+        title: 'gym-swal-title',
+        htmlContainer: 'gym-swal-text',
+        confirmButton: 'gym-swal-confirm',
+        cancelButton: 'gym-swal-cancel'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    backdrop: 'rgba(2, 6, 23, 0.62)',
+    buttonsStyling: false,
+    didOpen: (p) => {
+        p.style.borderRadius = '18px';
+        p.style.border = '1px solid var(--border)';
+        p.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        const ok = p.querySelector('.swal2-confirm');
+        if (ok) { ok.style.background = 'linear-gradient(45deg,#38BDF8,#3B82F6)'; ok.style.color = '#fff'; ok.style.border = 'none'; ok.style.borderRadius = '999px'; ok.style.padding = '10px 20px'; ok.style.fontWeight = '600'; }
+        const no = p.querySelector('.swal2-cancel');
+        if (no) { no.style.background = 'var(--surface-2)'; no.style.color = 'var(--text)'; no.style.border = '1px solid var(--border)'; no.style.borderRadius = '999px'; no.style.padding = '10px 20px'; no.style.fontWeight = '600'; }
+    }
+});
+
+const GymToast = window.GymToast || Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    customClass: {
+        container: 'swal-on-top',
+        popup: 'gym-toast-popup',
+        title: 'gym-toast-title',
+        htmlContainer: 'gym-toast-text'
+    },
+    background: 'var(--surface)',
+    color: 'var(--text)',
+    didOpen: (t) => {
+        t.style.borderRadius = '12px';
+        t.style.border = '1px solid var(--border)';
+        t.style.boxShadow = '0 20px 48px rgba(2,6,23,.28)';
+        t.addEventListener('mouseenter', Swal.stopTimer);
+        t.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+});
+
+window.GymSwal = window.GymSwal || GymSwal;
+window.GymToast = window.GymToast || GymToast;

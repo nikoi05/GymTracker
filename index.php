@@ -9,7 +9,7 @@ $public = ['home', 'login', 'register'];
 
 // protected pages require session check
 $allowed = ['dashboard', 'onboarding', 'workouts', 'exercises', 'progress', 'goals', 'settings', 'profile', 'calendar','getWorkoutDetails'];
-$hidden = ['admindash','admin_users'];
+$hidden = ['admindash','admin_users','admin_exercises','admin_workouts','admin_reports','admin_activity'];
 $basePath = __DIR__;
 $routes = [
     'home' => $basePath . '/views/home.php',
@@ -34,6 +34,10 @@ $routes = [
     //admin page
     'admindash' => $basePath . '/views/admin/admindashboard.php',
     'admin_users' => $basePath . '/views/admin/admin_users.php',
+    'admin_exercises' => $basePath . '/views/admin/admin_exercises.php',
+    'admin_workouts' => $basePath . '/views/admin/admin_workouts.php',
+    'admin_reports' => $basePath . '/views/admin/admin_reports.php',
+    'admin_activity' => $basePath . '/views/admin/admin_activity.php',
 ];
 // check if page is in the hidden array and if so check for admin session
 if(in_array($page, $hidden)){

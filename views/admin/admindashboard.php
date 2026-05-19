@@ -1,27 +1,34 @@
 <?php 
 require_once __DIR__ . '/../../BL/userManager.php';
 require_once __DIR__ . '/../../BL/WorkoutManager.php';
+require_once __DIR__ . '/../../BL/ActivityLogManager.php';
 $user = new managerUser();
- $usercount = $user->getAllUsers();
- $activetoday = $user->getActiveToday();
+$usercount = $user->getAllUsers();
+$activetoday = $user->getActiveToday();
  
- $wm = new WorkoutManager();
+$wm = new WorkoutManager();
 $totalWorkouts = $wm->totalWorkoutsLogged();
+$activityLogManager = new ActivityLogManager();
+$activityStats = $activityLogManager->getStats();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>GymTracker Admin - Dashboard</title>
     <link rel="stylesheet" href="/workout_trackersys/assets/Admindashboard.css">
+    <link rel="stylesheet" href="/workout_trackersys/assets/AdminUsers.css">
+    <link rel="stylesheet" href="/workout_trackersys/assets/admin-managers.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
 
 <body>
@@ -32,8 +39,8 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
 <!-- SIDEBAR -->
 <div class="Sidebar" id="sidebar">
     <div class="NavLinks">
-        <button class="toggle-btn" onclick="ToggleSidebar()">☰</button>
-        <span class="text">GymTracker Admin</span>
+        <button class="toggle-btn" onclick="ToggleSidebar()"><i class="material-icons">menu</i></button>
+        <div class="sidebar-brand"><span class="sidebar-logo" aria-hidden="true">&#128170;</span><span class="text"><span class="brand-gym">Gym</span>Tracker Admin</span></div>
         <ul>
             <li class="active" onclick="redirectAdmin(1)">
                 <i class="material-icons icon">dashboard</i>
@@ -47,18 +54,30 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
                 <i class="material-icons icon">fitness_center</i>
                 <span class="text">Exercises</span>
             </li>
+            <li onclick="redirectAdmin(6)">
+                <i class="material-icons icon">self_improvement</i>
+                <span class="text">Workouts</span>
+            </li>
             <li onclick="redirectAdmin(4)">
                 <i class="material-icons icon">bar_chart</i>
                 <span class="text">Reports</span>
             </li>
             <li onclick="redirectAdmin(5)">
-                <i class="material-icons icon">settings</i>
-                <span class="text">Settings</span>
+                <i class="material-icons icon">receipt_long</i>
+                <span class="text">Activity Logs</span>
             </li>
         </ul>
     </div>
 
-    <div class="Logout">  
+        <div class="sidebar-theme">
+        <span class="toggle-label" id="theme-label">Light</span>
+        <label class="toggle">
+            <input type="checkbox" id="themeToggle">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"><i class="material-icons">brightness_5</i></div>
+        </label>
+    </div>
+<div class="Logout">  
         <button type="button" onclick="LogoutFunc()">
             <i class="material-icons">logout</i>
             <span class="text">Logout</span>
@@ -74,46 +93,36 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
                 <h3>Hello, Admin <?= $_SESSION['username'] ?></h3>
                 <h5>let&rsquo;s take a look at your platform activity today</h5>
             </div>
-            <div class="toggle-wrap">
-                <span class="toggle-label" id="theme-label">Light</span>
-                <label class="toggle">
-                    <input type="checkbox" id="themeToggle">
-                    <div class="toggle-track"></div>
-                    <div class="toggle-thumb"><i class="material-icons light-icon">brightness_5</i></div>
-                </label>
-            </div>
         </div>
         
-        <div class="stats-grid">
+        <div class="stats-row">
             <div class="stat-card" style="animation-delay:0.05s">
-                <div class="stat-top">
-                    <div class="stat-icon">👥</div>
+                <div class="stat-icon"><i class="material-icons">groups</i></div>
+                <div>
+                    <div class="stat-val" id="statUsers"><?= $usercount ?></div>
+                    <div class="stat-label">Total Users</div>
                 </div>
-                <div class="stat-val" id="statUsers"><?= $usercount ?></div>
-                <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card" style="animation-delay:0.10s">
-                <div class="stat-top">
-                    <div class="stat-icon">🏋️</div>
+                <div class="stat-icon"><i class="material-icons">fitness_center</i></div>
+                <div>
+                    <div class="stat-val" id="statWorkouts"><?= $totalWorkouts ?></div>
+                    <div class="stat-label">Workouts Logged</div>
                 </div>
-                <div class="stat-val" id="statWorkouts"><?= $totalWorkouts ?></div>
-                <div class="stat-label">Workouts Logged</div>
             </div>
             <div class="stat-card" style="animation-delay:0.15s">
-                <div class="stat-top">
-                    <div class="stat-icon">📊</div>
-                    <span class="stat-change up">↑ 12%</span>
+                <div class="stat-icon"><i class="material-icons">trending_up</i></div>
+                <div>
+                    <div class="stat-val" id="statActive"><?= $activetoday ?></div>
+                    <div class="stat-label">Active Today</div>
                 </div>
-                <div class="stat-val" id="statActive"><?= $activetoday ?></div>
-                <div class="stat-label">Active Today</div>
             </div>
             <div class="stat-card" style="animation-delay:0.20s">
-                <div class="stat-top">
-                    <div class="stat-icon">⚠️</div>
-                    <span class="stat-change neutral">steady</span>
+                <div class="stat-icon"><i class="material-icons">receipt_long</i></div>
+                <div>
+                    <div class="stat-val" id="statAlerts"><?= $activityStats['today'] ?></div>
+                    <div class="stat-label">Logs Today</div>
                 </div>
-                <div class="stat-val" id="statAlerts">2</div>
-                <div class="stat-label">System Alerts</div>
             </div>
         </div>
  
@@ -131,10 +140,11 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
             <div class="card" style="animation-delay:0.15s">
                 <div class="card-header"><div class="card-title">Quick Actions</div></div>
                 <div class="quick-actions">
-                    <div class="qa-btn" onclick="redirectAdmin(2)"><div class="qa-icon">👥</div><div class="qa-label">Users</div></div>
-                    <div class="qa-btn" onclick="redirectAdmin(3)"><div class="qa-icon">🏋️</div><div class="qa-label">Exercises</div></div>
-                    <div class="qa-btn" onclick="redirectAdmin(4)"><div class="qa-icon">📊</div><div class="qa-label">Reports</div></div>
-                    <div class="qa-btn" onclick="redirectAdmin(5)"><div class="qa-icon">⚙️</div><div class="qa-label">Settings</div></div>
+                    <div class="qa-btn" onclick="redirectAdmin(2)"><div class="qa-icon"><i class="material-icons">people</i></div><div class="qa-label">Users</div></div>
+                    <div class="qa-btn" onclick="redirectAdmin(3)"><div class="qa-icon"><i class="material-icons">fitness_center</i></div><div class="qa-label">Exercises</div></div>
+                    <div class="qa-btn" onclick="redirectAdmin(6)"><div class="qa-icon"><i class="material-icons">self_improvement</i></div><div class="qa-label">Workouts</div></div>
+                    <div class="qa-btn" onclick="redirectAdmin(4)"><div class="qa-icon"><i class="material-icons">bar_chart</i></div><div class="qa-label">Reports</div></div>
+                    <div class="qa-btn" onclick="redirectAdmin(5)"><div class="qa-icon"><i class="material-icons">receipt_long</i></div><div class="qa-label">Logs</div></div>
                 </div>
             </div>
            
@@ -159,7 +169,7 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
             </div>
              <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Activity Total Duration <span style="color:gray">mins</span></div>
+                    <div class="card-title">Activity Total Duration <span style="color: var(--text-muted);">mins</span></div>
 
                     <div class="chart-tabs">
                         <button class="chart-tab active">Weekly</button>
@@ -181,7 +191,14 @@ $totalWorkouts = $wm->totalWorkoutsLogged();
 <script src="/workout_trackersys/scripts/redirect.js"></script>
 <script src="/workout_trackersys/scripts/AdminDash.js"></script>
 <script src="/workout_trackersys/scripts/magic.js"></script>
-<script src="/workout_trackersys/scripts/authservices.js"></script>
 
+
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span>Tracker</div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
 </body>
 </html>

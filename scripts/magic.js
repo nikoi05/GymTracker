@@ -71,3 +71,24 @@ document.querySelector('.hamburger').addEventListener('click', function() {
             `;
             container.appendChild(p);
         }
+
+/* ============================================================
+   LOGOUT FUNCTION
+============================================================ */
+window.LogoutFunc = window.LogoutFunc || function() {
+    (window.GymSwal || Swal).fire({
+        title: 'Leaving so soon?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, log out',
+        cancelButtonText: 'Stay'
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.ajax({
+                url: '/workout_trackersys/controllers/logout.php',
+                type: 'POST',
+                success: () => window.location.href = '?page=login'
+            });
+        }
+    });
+};

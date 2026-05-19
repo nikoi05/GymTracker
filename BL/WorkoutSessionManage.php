@@ -40,5 +40,8 @@ public function GetStreak($userID){
 public function GetRecentWorkouts($userID){
     return $this->WorkoutSessionModel->getRecentWorkouts($userID);
 }
+public function GetWorkoutAnalytics($userID){
+    return $this->WorkoutSessionModel->getWorkoutAnalytics($userID);
+}
 }
 ?>

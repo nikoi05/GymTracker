@@ -2,7 +2,7 @@
 session_start();
 $userID = $_SESSION['userID'];
 
-require_once __DIR__ . "../../BL/WorkoutSessionManage.php";
+require_once __DIR__ . "/../BL/WorkoutSessionManage.php";
 $wsm = new WorkoutSessionManage();
 
 // type from services

@@ -11,9 +11,10 @@
     <!-- Compiled and minified JavaScript -->
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <title>Gym Tracker - Register</title>
+    <title>GymTracker - Register</title>
+    <link rel="stylesheet" href="/workout_trackersys/assets/footer.css">
 </head>
-<body>
+<body class="auth-page">
     <div class="intro-loader">
     <h1 class="siteName">💪<span>Gym</span>Tracker</h1>
     </div>
@@ -37,51 +38,62 @@
     <div class="register-container">
         
         <h1 class="register-title">Create Account</h1>
-        <p class="register-subtitle">Start your fitness journey 💪</p>
+        <p class="register-subtitle">Start your fitness journey <i class="material-icons" style="font-size:16px;vertical-align:middle">fitness_center</i></p>
 
         <form class="register-form">
 
             <div class="input-group">
-                <label>Username</label>
-                <input type="text" id="username" required maxlength="50">
+                <label>Username <span class="required-mark">*</span></label>
+<input type="text" id="username" required maxlength="50" minlength="3" autocomplete="username">
             </div>
 
             <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="email" placeholder="e.g juandelacruz@email.com" required maxlength="50">
+                <label>Email <span class="required-mark">*</span></label>
+<input type="email" id="email" placeholder="e.g juandelacruz@email.com" required maxlength="50" minlength="5" autocomplete="email">
             </div>
 
             <div class="input-group">
-                <label>Password</label>
+                <label>Password <span class="required-mark">*</span></label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" required maxlength="50">
+<input type="password" id="password" required maxlength="50" minlength="8" autocomplete="new-password">
                     <span class="material-icons" data-target="password" onclick="unhidepassFUNC(this)">visibility</span>
                 </div>
+                <ul class="password-rules" id="passwordRules" aria-live="polite">
+                    <li data-rule="length">At least 8 characters</li>
+                    <li data-rule="uppercase">One uppercase letter</li>
+                    <li data-rule="lowercase">One lowercase letter</li>
+                    <li data-rule="number">One number</li>
+                    <li data-rule="special">One special character</li>
+                </ul>
             </div>
 
             <div class="input-group">
-                <label>Confirm Password</label>
+                <label>Confirm Password <span class="required-mark">*</span></label>
                 <div class="input-wrapper">
-                    <input type="password" id="confirm_password" required maxlength="50">
+<input type="password" id="confirm_password" required maxlength="50" minlength="8" autocomplete="new-password">
                     <span class="material-icons" data-target="confirm_password" onclick="unhidepassFUNC(this)">visibility</span>
                 </div>
+                <small class="field-hint" id="passwordMatchHint" aria-live="polite">Passwords must match.</small>
             </div>
 
             <div class="input-group">
-                <label>Gender</label>
+                <label>Gender <span class="required-mark">*</span></label>
                 <select id="gender" onchange="toggleselectgender(this)" required>
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="" disabled selected>Select Gender</option>
+                    <?php 
+                    $genders = $user->getGender();
+                    foreach($genders as $g): ?>
+                        <option value="<?= $g['genderID'] ?>"><?= htmlspecialchars($g['gender']) ?></option>
+                    <?php endforeach; ?>
                 </select>
 
                 <input type="text" id="othergender" placeholder="Please specify" style="display:none;" maxlength="50">
             </div>
 
             <div class="input-group">
-                <label>Date of Birth</label>
+                <label>Date of Birth <span class="required-mark">*</span></label>
                 <input type="date" id="doBirth" required>
+                <small class="field-hint" id="dobHint" aria-live="polite">You must be 18 years old or older. Future dates are not allowed.</small>
             </div>
 
             <button type="button" class="register-button" onclick="registerUserFunc()">
@@ -99,18 +111,11 @@
     </div>
 </main>
 <footer>
-        <div class="footer-container">
-            <div class="footer-brand">💪 GymTracker</div>
-            <div class="footer-links">
-                <a href="#">Features</a>
-                <a href="#">Pricing</a>
-                <a href="#">Contact</a>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            © 2026 Gym Tracker. Built with ❤️ for fitness lovers by Niko
-        </div>
-    </footer>
+    <div class="footer-container">
+        <div class="footer-brand">&#128170;<span class="brand-gym">Gym</span><span style="color:white;">Tracker</span></div>
+    </div>
+    <div class="footer-copyright">&copy; 2026 Gym Tracker. Built with &hearts; for fitness lovers by Niko</div>
+</footer>
 </body>
 
 <script src="/workout_trackersys/scripts/redirect.js"></script>

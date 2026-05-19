@@ -10,9 +10,9 @@ class WorkoutExerciseModel{
     public function addExerciseToWorkout($data){
         try{
             $sqlquery = "INSERT INTO tbl_workout_exercises
-                (userID, workoutId, exerciseID,customExerciseName,type, sets, reps, weight, distance_km, durationInMinutes, holdTimeSec, rest, created_At, updated_At)
+                (userID, workoutId, exerciseID,customExerciseName,muscle,type, sets, reps, weight, distance_km, durationInMinutes, holdTimeSec, rest, created_At, updated_At)
                 VALUES
-                (:userID, :workoutID, :exerciseID,:customExerciseName,:type, :sets, :reps, :weight, :distance_km, :durationInMinutes, :holdTimeSec, :rest, NOW(), NOW())";
+                (:userID, :workoutID, :exerciseID,:customExerciseName,:muscle,:type, :sets, :reps, :weight, :distance_km, :durationInMinutes, :holdTimeSec, :rest, NOW(), NOW())";
 
             $stmt = $this->conn->prepare($sqlquery);
 
@@ -25,6 +25,7 @@ class WorkoutExerciseModel{
             $stmt->bindParam(':workoutID', $data['workoutID']);
             $stmt->bindParam(':exerciseID', $data['exerciseID']);
             $stmt->bindParam(':customExerciseName', $data['name']);
+            $stmt->bindParam(':muscle', $data['muscle']);
             $stmt->bindParam(':type', $data['typeID']);
             $stmt->bindParam(':sets', $data['sets']);
             $stmt->bindParam(':reps', $data['reps']);
@@ -73,11 +74,12 @@ public function getWorkoutExercisesInfo($id){
     we.distance_km,
     et.description as exerciseType,
     
-    COALESCE(e.muscle, 'Custom') as muscle
+    COALESCE(e.muscle, m.muscle) as muscle
 FROM tbl_workout_exercises we
 INNER JOIN tbl_workouts w ON we.workoutId = w.workoutID
 LEFT JOIN tbl_exercise_type et ON we.type = et.typeID
 LEFT JOIN tbl_exercises e ON we.exerciseID = e.exerciseID
+LEFT JOIN tbl_muscles m ON we.muscle = m.muscleID
 WHERE we.workoutId = :workoutId
 ORDER BY we.created_At DESC;";
  $stmt = $this->conn->prepare($sqlQuery);
@@ -87,6 +89,28 @@ ORDER BY we.created_At DESC;";
 
     }catch(PDOException $e){
         echo "Error " . $e->getMessage();
+        return false;
+    }
+}
+public function getWorkoutExerciseById($id){
+    try{
+        $sqlQuery = "SELECT
+            we.workout_exercises_ID,
+            we.userID,
+            we.workoutId,
+            we.exerciseID,
+            COALESCE(e.name, we.customExerciseName) AS exerciseName,
+            w.name AS workoutName
+        FROM tbl_workout_exercises we
+        LEFT JOIN tbl_workouts w ON we.workoutId = w.workoutID
+        LEFT JOIN tbl_exercises e ON we.exerciseID = e.exerciseID
+        WHERE we.workout_exercises_ID = :id
+        LIMIT 1";
+        $stmt = $this->conn->prepare($sqlQuery);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }catch(PDOException $e){
         return false;
     }
 }
